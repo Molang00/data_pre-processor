@@ -25,9 +25,9 @@ class Converter:
         # path_csv csv파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_och = self.check_slash(self, path_och)
-        path_csv = self.check_slash(self, path_csv)
-        name_of_dir = self.check_slash(self, name_of_dir)
+        path_och = self.check_slash(path_och)
+        path_csv = self.check_slash(path_csv)
+        name_of_dir = self.check_slash(name_of_dir)
         path_och = path_och + name_of_dir + '*.och'
         path_csv = path_csv + name_of_dir
 
@@ -81,9 +81,9 @@ class Converter:
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_och = self.check_slash(self, path_och)
-        path_csv = self.check_slash(self, path_csv)
-        name_of_dir = self.check_slash(self, name_of_dir)
+        path_och = self.check_slash(path_och)
+        path_csv = self.check_slash(path_csv)
+        name_of_dir = self.check_slash(name_of_dir)
         path_och = path_och + name_of_dir
         path_csv = path_csv + name_of_dir+'*.csv'
 
@@ -117,18 +117,19 @@ class Converter:
             file_to_write.close()
             file_to_read.close()
 
+if __name__ == "__main__":
 
-# argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-need_to_convert_dir = '드래곤즈 0617'
-convertObject = Converter()
+    # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
+    need_to_convert_dir = '드래곤즈 0617'
+    convertObject = Converter()
 
-# .och에서 .csv로의 변환을 원하는 경우
-root_och_to_read = 'data/1. data_och_format/'
-root_csv_to_write = 'data/2. data_csv_format/'
-convertObject.convert_och_to_csv(convertObject, root_och_to_read, root_csv_to_write, need_to_convert_dir)
+    # .och에서 .csv로의 변환을 원하는 경우
+    root_och_to_read = 'data/1. data_och_format/'
+    root_csv_to_write = 'data/2. data_csv_format/'
+    convertObject.convert_och_to_csv(root_och_to_read, root_csv_to_write, need_to_convert_dir)
 
-# .csv에서 .och로의 변환을 원하는 경우
-# 현재 기능 구현 확인을 위한 임의 path이고, 추후 필요에 따른 경로 변경 필요
-root_csv_to_read = 'data/3. data_csv_second_average/'
-root_och_to_write = 'data/4. data_och_second_average/'
-convertObject.convert_csv_to_och(convertObject, root_csv_to_read, root_och_to_write, need_to_convert_dir)
+    # .csv에서 .och로의 변환을 원하는 경우
+    # 현재 기능 구현 확인을 위한 임의 path이고, 추후 필요에 따른 경로 변경 필요
+    root_csv_to_read = 'data/3. data_csv_second_average/'
+    root_och_to_write = 'data/4. data_och_second_average/'
+    convertObject.convert_csv_to_och(root_csv_to_read, root_och_to_write, need_to_convert_dir)
