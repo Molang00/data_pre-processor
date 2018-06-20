@@ -29,14 +29,13 @@ class Converter:
         # path_csv csv파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        self.create_dir(convertObject, path_csv + name_of_dir)
-
         path_och = self.check_slash(self, path_och)
         path_csv = self.check_slash(self, path_csv)
         name_of_dir = self.check_slash(self, name_of_dir)
-        print(path_csv, path_och, name_of_dir)
         path_och = path_och + name_of_dir + '*.och'
         path_csv = path_csv + name_of_dir
+
+        self.create_dir(convertObject, path_csv)
 
         files_och = glob.glob(path_och)
         # .csv의 경우 가장 첫번째 줄에 이후 정보들의 저장 순서를 저장함
@@ -46,8 +45,6 @@ class Converter:
             # .och파일과 같은 이름을 가진 .csv파일명 생성
             file_csv = path_csv+file_och[len(path_och)-5:]
             file_csv = file_csv[:len(file_csv)-3]+'csv'
-            print('read from file_och: '+file_och)
-            print('write at file_csv: '+file_csv)
 
             file_to_read = open(file_och, 'r')
             file_to_write = open(file_csv, 'w')
@@ -89,13 +86,13 @@ class Converter:
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        self.create_dir(convertObject, path_och + name_of_dir)
-
         path_och = self.check_slash(self, path_och)
         path_csv = self.check_slash(self, path_csv)
         name_of_dir = self.check_slash(self, name_of_dir)
         path_och = path_och + name_of_dir
         path_csv = path_csv + name_of_dir+'*.csv'
+
+        self.create_dir(convertObject, path_och)
 
         files_csv = glob.glob(path_csv)
 
@@ -103,8 +100,6 @@ class Converter:
             # .csv파일과 같은 이름을 가진 .och파일명 생성
             file_och = path_och+file_csv[len(path_csv)-5:]
             file_och = file_och[:len(file_och)-3]+'och'
-            print('read from file_csv: '+file_csv)
-            print('write at file_och: '+file_och)
 
             file_to_read = open(file_csv, 'r')
             file_to_write = open(file_och, 'w')
@@ -129,7 +124,7 @@ class Converter:
 
 
 # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-need_to_convert_dir = '드래곤즈 0617/'
+need_to_convert_dir = '드래곤즈 0617'
 convertObject = Converter()
 
 # .och에서 .csv로의 변환을 원하는 경우
