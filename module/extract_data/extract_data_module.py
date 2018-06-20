@@ -9,9 +9,7 @@ class Extract_data:
         R = 6378.137
         dLat = (lat1 - lat2) * math.pi / 180
         dLon = (lon1 - lon2) * math.pi / 180
-        a = math.sin(dLat / 2) * math.sin(dLat / 2) + \
-            math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
-            math.sin(dLon / 2) * math.sin(dLon / 2)
+        a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * math.sin(dLon / 2) * math.sin(dLon / 2)
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         d = R * c
         return d * 1000
@@ -43,9 +41,10 @@ class Extract_data:
             value_temp[0]=float(value_temp[0]) #longitude
             value_temp[1] = float(value_temp[1]) #latitude
             value_temp[2] = float(value_temp[2])
+
+            count = 1
             longitude = value_temp[0]
             latitude = value_temp[1]
-            count = 1
 
             for read_value in read_values[2:]:
                 data = read_value.split(',')
@@ -60,9 +59,10 @@ class Extract_data:
                     for i, v in enumerate(value):
                         value_temp[i] = value_temp[i] + v
                     count = count + 1
-                    value_temp[3] = self.measure(latitude, longitude, value_temp[0], value_temp[1])
-                    longitude = value_temp[0]
-                    latitude = value_temp[1]
+                    value_temp[3] = self.measure(latitude, longitude, value_temp[1]/count, value_temp[0]/count)
+                    print(value_temp[3])
+                    longitude = value_temp[0]/count
+                    latitude = value_temp[1]/count
                 else:
                     for time_idx, time_string in enumerate(check_time_temp[:6]):
                         if time_idx == 0:
@@ -72,7 +72,8 @@ class Extract_data:
                     value_temp[0] = value_temp[0] / count #longitude
                     value_temp[1] = value_temp[1] / count #latitude
                     value_temp[2] = value_temp[2] / count
-                    value_temp[3] = self.measure(latitude,longitude,value_temp[0],value_temp[1])
+                    value_temp[3] = self.measure(latitude,longitude,value_temp[1],value_temp[0])
+                    print(value_temp[3])
                     longitude = value_temp[0]
                     latitude =  value_temp[1]
 
@@ -111,6 +112,6 @@ class Extract_data:
 root_csv = 'data/2. data_csv_format/'
 root_summarized = 'data/3. data_csv_second_average/'
 name_of_dir = '드래곤즈 0617/'
-
+Extract_data()
 extractObject = Extract_data()
 extractObject.summarize_csv(root_csv + name_of_dir, root_summarized + name_of_dir)
