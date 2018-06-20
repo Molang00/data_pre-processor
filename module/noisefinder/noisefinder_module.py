@@ -47,21 +47,23 @@ class NoiseFinder:
                     error_list.append(error_str)
         return error_list
 
-    def find_noise_in_data(self, path_read, path_write, name_of_dir):
-        # path_read 읽을 파일이 저장된 path를 string으로 저장
-        # path_write 파일을 쓰고자 하는 path를 string으로 저장
+    def find_noise_in_data(self, path_read_folder, path_write_folder, name_of_dir):
+        # path_read_folder 읽을 파일이 저장된 path를 string으로 저장
+        # path_write_folder 파일을 쓰고자 하는 path를 string으로 저장
         # nmae_of_dir 읽을 파일과 쓰고자 하는 파일의 dir name을 string으로 저장
 
-        path_read = self.check_slash(path_read)
-        path_write = self.check_slash(path_write)
+        path_read_folder = self.check_slash(path_read_folder)
+        path_write_folder = self.check_slash(path_write_folder)
         name_of_dir = self.check_slash(name_of_dir)
-        path_read = path_read+name_of_dir+'*.csv'
-        path_write = path_write+name_of_dir
+        path_read_folder = path_read_folder+name_of_dir+'*.csv'
+        path_write_folder = path_write_folder+name_of_dir
 
-        self.create_dir(path_write)
-        file_to_write = open(path_write+'error.csv', 'w')
+        self.create_dir(path_write_folder)
+        file_to_write = open(path_write_folder+'error.csv', 'w')
+        write_order = 'path_filename,start_time,end_time,error_code'
+        file_to_write.write(write_order)
 
-        files_read = glob.glob(path_read)
+        files_read = glob.glob(path_read_folder)
         for file_read in files_read:
             file_to_read = open(file_read, 'r')
 
