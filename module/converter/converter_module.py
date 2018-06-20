@@ -4,8 +4,6 @@ import os
 
 class Converter:
 
-    # dir를 생성
-    @staticmethod
     def create_dir(self, directory):
         # directory dir명이 포함된 path가 string으로 저장
         try:
@@ -14,7 +12,6 @@ class Converter:
         except OSError:
             print('Error: Creating directory. '+directory)
 
-    @staticmethod
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
 
@@ -23,7 +20,6 @@ class Converter:
             path_string = path_string+'/'
         return path_string
 
-    @staticmethod
     def convert_och_to_csv(self, path_och, path_csv, name_of_dir):
         # path_och 읽을 och파일이 저장된 path를 string으로 저장
         # path_csv csv파일을 쓰고자 하는 path를 string으로 저장
@@ -64,7 +60,7 @@ class Converter:
 
                     # 시간과 관련된 정보는 '.'으로 이어져 있는 것을 ','로 연결
                     data_to_write = value_time_list[0]
-                    for time_string in value_time_list[1:]:
+                    for time_string in value_time_list:
                         data_to_write = data_to_write + ',' + time_string
 
                     # 이외의 정보는 ' '로 이어져 있는 것을 ','로 연결
@@ -80,7 +76,6 @@ class Converter:
             file_to_write.close()
             file_to_read.close()
 
-    @staticmethod
     def convert_csv_to_och(self, path_csv, path_och, name_of_dir):
         # path_csv 읽을 csv파일이 저장된 path를 string으로 저장
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
@@ -111,11 +106,11 @@ class Converter:
 
                 # 시간과 관련된 정보는 ','로 이어져 있는 것을 '.'로 연결
                 data_to_write = value_csv_list[0]
-                for time_csv_string in value_csv_list[1:7]:
+                for time_csv_string in value_csv_list[1:8]:
                     data_to_write = data_to_write+'.'+time_csv_string
 
                 # 이외의 정보는 ','로 이어져 있는 것을 ' '로 연결
-                for value_csv_string in value_csv_list[7:]:
+                for value_csv_string in value_csv_list[8:]:
                     data_to_write = data_to_write+' '+value_csv_string
                 file_to_write.write(data_to_write)
 
@@ -137,4 +132,3 @@ convertObject.convert_och_to_csv(convertObject, root_och_to_read, root_csv_to_wr
 root_csv_to_read = 'data/3. data_csv_second_average/'
 root_och_to_write = 'data/4. data_och_second_average/'
 convertObject.convert_csv_to_och(convertObject, root_csv_to_read, root_och_to_write, need_to_convert_dir)
-
