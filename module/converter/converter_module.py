@@ -132,9 +132,10 @@ root_och_to_read = 'data/1. data_och_format/'
 root_csv_to_write = 'data/2. data_csv_format/'
 convertObject.convert_och_to_csv(convertObject, root_och_to_read, root_csv_to_write, need_to_convert_dir)
 
+
 # .csv에서 .och로의 변환을 원하는 경우
 # 현재 기능 구현 확인을 위한 임의 path이고, 추후 필요에 따른 경로 변경 필요
-root_csv_to_read = 'data/3. data_csv_second_average/'
-root_och_to_write = 'data/4. data_och_second_average/'
-convertObject.convert_csv_to_och(convertObject, root_csv_to_read, root_och_to_write, need_to_convert_dir)
-
+# root_csv_to_read = 'data/3. data_csv_second_average/'
+# root_och_to_write = 'data/4. data_och_second_average/'
+# convertObject.convert_csv_to_och(convertObject, root_csv_to_read, root_och_to_write, need_to_convert_dir)
+#
