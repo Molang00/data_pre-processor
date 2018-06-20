@@ -4,8 +4,6 @@ import os
 
 class NoiseFinder:
 
-    # dir를 생성
-    @staticmethod
     def create_dir(self, directory):
         # directory dir명이 포함된 path가 string으로 저장
         try:
@@ -14,7 +12,6 @@ class NoiseFinder:
         except OSError:
             print('Error: Creating directory. '+directory)
 
-    @staticmethod
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
 
@@ -23,7 +20,6 @@ class NoiseFinder:
             path_string = path_string+'/'
         return path_string
 
-    @staticmethod
     def find_speed_error(self, values_list):
         # value_list .csv file에서 읽어온 정보를 줄별로 담고있는 list를 저장
 
@@ -51,7 +47,6 @@ class NoiseFinder:
                     error_list.append(error_str)
         return error_list
 
-    @staticmethod
     def find_noise_in_data(self, path_read, path_write, name_of_dir):
         # path_read 읽을 파일이 저장된 path를 string으로 저장
         # path_write 파일을 쓰고자 하는 path를 string으로 저장
@@ -85,4 +80,3 @@ noisefinderObject = NoiseFinder()
 root_for_read = 'data/3. data_csv_second_average/'
 root_for_write = 'data/30. data_noise/'
 noisefinderObject.find_noise_in_data(noisefinderObject, root_for_read, root_for_write, need_to_compute_dir)
-
