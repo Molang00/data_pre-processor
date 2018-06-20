@@ -3,15 +3,15 @@ import os
 import locale
 class extract_data:
 
-    @staticmethod
-    def create_dir(self,directory):
+    # noinspection PyMethodMayBeStatic
+    def create_dir(self, directory):
         try:
             if not os.path.exists(directory):
                 os.makedirs(directory)
         except OSError:
             print('Error: Creating directory.'+directory)
 
-    @staticmethod
+    # noinspection PyMethodMayBeStatic
     def summarize_csv(self, path_csv, path_summarized):
         files_csv = glob.glob(path_csv)
         write_order = 'year,month,day,hour,minute,second,longitude,latitude,speed'
@@ -86,18 +86,11 @@ if __name__ == "__main__":
     name_of_dir = '드래곤즈 0617/'
 
     extractObject = extract_data()
-    extractObject.create_dir(extractObject, root_summarized+name_of_dir)
-    extractObject.summarize_csv(extractObject, root_csv + name_of_dir+'*.csv', root_summarized + name_of_dir)
-
+    extractObject.create_dir(root_summarized+name_of_dir)
+    print("A")
+    extractObject.summarize_csv(root_csv + name_of_dir+'*.csv', root_summarized + name_of_dir)
+    print("B")
     '''
-        1. self에 변수 안넣음
-        
-        extractObject.create_dir(extractObject, root_summarized+name_of_dir) 
-        -> extractObject.create_dir( root_summarized+name_of_dir)
-        
-        path_source_csv_folder
-        
-        path_destination_folder
         
     
     '''
