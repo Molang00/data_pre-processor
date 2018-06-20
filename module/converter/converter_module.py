@@ -64,7 +64,7 @@ class Converter:
 
                     # 시간과 관련된 정보는 '.'으로 이어져 있는 것을 ','로 연결
                     data_to_write = value_time_list[0]
-                    for time_string in value_time_list:
+                    for time_string in value_time_list[1:]:
                         data_to_write = data_to_write + ',' + time_string
 
                     # 이외의 정보는 ' '로 이어져 있는 것을 ','로 연결
@@ -111,11 +111,11 @@ class Converter:
 
                 # 시간과 관련된 정보는 ','로 이어져 있는 것을 '.'로 연결
                 data_to_write = value_csv_list[0]
-                for time_csv_string in value_csv_list[1:8]:
+                for time_csv_string in value_csv_list[1:7]:
                     data_to_write = data_to_write+'.'+time_csv_string
 
                 # 이외의 정보는 ','로 이어져 있는 것을 ' '로 연결
-                for value_csv_string in value_csv_list[8:]:
+                for value_csv_string in value_csv_list[7:]:
                     data_to_write = data_to_write+' '+value_csv_string
                 file_to_write.write(data_to_write)
 
