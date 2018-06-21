@@ -60,7 +60,7 @@ class NoiseFinder:
 
         self.create_dir(path_write_folder)
         file_to_write = open(path_write_folder+'error.csv', 'w')
-        write_order = 'path_filename,start_time,end_time,error_code'
+        write_order = 'path,filename,start_time,end_time,error_code\n'
         file_to_write.write(write_order)
 
         files_read = glob.glob(path_read_folder)
@@ -72,7 +72,7 @@ class NoiseFinder:
             # file에서 읽어온 정보를 이용해 speed_error를 찾고 error.csv에 쓰기
             speed_error_list = self.find_speed_error(read_values)
             for speed_error_str in speed_error_list:
-                file_to_write.write(file_read+','+speed_error_str+'\n')
+                file_to_write.write(file_read[:len(path_read_folder)-5]+','+file_read[len(path_read_folder)-5:]+','+speed_error_str+'\n')
 
 if __name__ == "__main__":
 
