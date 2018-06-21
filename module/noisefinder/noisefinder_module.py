@@ -47,36 +47,39 @@ class NoiseFinder:
                     error_list.append(error_str)
         return error_list
 
-    def find_noise_in_data(self, path_read, path_write, name_of_dir):
-        # path_read 읽을 파일이 저장된 path를 string으로 저장
-        # path_write 파일을 쓰고자 하는 path를 string으로 저장
+    def find_noise_in_data(self, path_read_folder, path_write_folder, name_of_dir):
+        # path_read_folder 읽을 파일이 저장된 path를 string으로 저장
+        # path_write_folder 파일을 쓰고자 하는 path를 string으로 저장
         # nmae_of_dir 읽을 파일과 쓰고자 하는 파일의 dir name을 string으로 저장
 
-        path_read = self.check_slash(self, path_read)
-        path_write = self.check_slash(self, path_write)
-        name_of_dir = self.check_slash(self, name_of_dir)
-        path_read = path_read+name_of_dir+'*.csv'
-        path_write = path_write+name_of_dir
+        path_read_folder = self.check_slash(path_read_folder)
+        path_write_folder = self.check_slash(path_write_folder)
+        name_of_dir = self.check_slash(name_of_dir)
+        path_read_folder = path_read_folder+name_of_dir+'*.csv'
+        path_write_folder = path_write_folder+name_of_dir
 
-        self.create_dir(self, path_write)
-        file_to_write = open(path_write+'error.csv', 'w')
+        self.create_dir(path_write_folder)
+        file_to_write = open(path_write_folder+'error.csv', 'w')
+        write_order = 'path,filename,start_time,end_time,error_code\n'
+        file_to_write.write(write_order)
 
-        files_read = glob.glob(path_read)
+        files_read = glob.glob(path_read_folder)
         for file_read in files_read:
             file_to_read = open(file_read, 'r')
 
             read_values = file_to_read.readlines()
 
             # file에서 읽어온 정보를 이용해 speed_error를 찾고 error.csv에 쓰기
-            speed_error_list = self.find_speed_error(self, read_values)
+            speed_error_list = self.find_speed_error(read_values)
             for speed_error_str in speed_error_list:
-                file_to_write.write(file_read+','+speed_error_str+'\n')
+                file_to_write.write(file_read[:len(path_read_folder)-5]+','+file_read[len(path_read_folder)-5:]+','+speed_error_str+'\n')
 
+if __name__ == "__main__":
 
-# argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-need_to_compute_dir = '드래곤즈 0617/'
-noisefinderObject = NoiseFinder()
+    # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
+    need_to_compute_dir = '드래곤즈 0617/'
+    noisefinderObject = NoiseFinder()
 
-root_for_read = 'data/3. data_csv_second_average/'
-root_for_write = 'data/30. data_noise/'
-noisefinderObject.find_noise_in_data(noisefinderObject, root_for_read, root_for_write, need_to_compute_dir)
+    root_for_read = 'data/3. data_csv_second_average/'
+    root_for_write = 'data/30. data_noise/'
+    noisefinderObject.find_noise_in_data(root_for_read, root_for_write, need_to_compute_dir)
