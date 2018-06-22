@@ -124,6 +124,7 @@ class Find_field_csv:
                 print('Error: Creating directory.' + path_to_save)
 
         with open(path_to_save + "fieldmatch.txt", "w+", encoding="utf-8") as f:
+            f.write('path of data file,file name,field number,field name,pointA(lat,lon),pointB(lat,lon),pointC(lat,lon),pointD(lat,lon)\n')
             lines = "\n".join(e[0] + ", " + str(e[1]) for e in outputList)
             f.writelines(lines)
 
