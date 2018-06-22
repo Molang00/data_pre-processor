@@ -114,7 +114,8 @@ class Find_field_csv:
             csv_file_path = os.path.join(str(file_csv)).replace("\\", "/")
             print('csvfilepath:' + csv_file_path)
             field_data = self.find_field_csv_file(csv_file_path, field_info_path)
-            outputList.append([file_csv, field_data])
+            name_file_csv = file_csv.replace('\\','/,')
+            outputList.append([name_file_csv, field_data])
             # 디렉토리가 없으면은 생성해준다.
             try:
                 if not os.path.exists(path_to_save):
