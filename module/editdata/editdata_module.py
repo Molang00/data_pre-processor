@@ -132,17 +132,18 @@ class EditData:
             file_to_write.close()
         file_to_error_read.close()
 
+if __name__ == "main":
 
-start_time = time.time()
+    start_time = time.time()
 
-# argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-need_to_compute_dir = 'A-02_U18_인천'
-editdataObjtect = EditData()
+    # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
+    need_to_compute_dir = 'A-02_U18_인천'
+    editdataObjtect = EditData()
 
-root_for_read_csv = 'data/2. data_csv_format/'
-root_for_read_error = 'data/30. data_noise/'
-root_for_write = 'data/5. data_csv_cut_error/'
-editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+    root_for_read_csv = 'data/2. data_csv_format/'
+    root_for_read_error = 'data/30. data_noise/'
+    root_for_write = 'data/5. data_csv_cut_error/'
+    editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
 
-end_time = time.time()-start_time
-print('edit_data : '+str(format(end_time, '.6f'))+'sec\n')
+    end_time = time.time()-start_time
+    print('edit_data : '+str(format(end_time, '.6f'))+'sec\n')

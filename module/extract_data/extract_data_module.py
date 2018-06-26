@@ -113,11 +113,14 @@ class Extract_data:
 
             file_to_read.close()
 
-root_csv = 'data/2. data_csv_format/'
-root_summarized = 'data/3. data_csv_second_average/'
-# 현재는 디렉토리가 드래곤즈지만 나중에 변수로 둘 수 있을 듯하다.
-name_of_dir = '드래곤즈 0617/'
 
-Extract_data()
-extractObject = Extract_data()
-extractObject.summarize_csv(root_csv + name_of_dir, root_summarized +name_of_dir)
+if __name__ == "__main__":
+
+    root_csv = 'data/2. data_csv_format/'
+    root_summarized = 'data/3. data_csv_second_average/'
+    # 현재는 디렉토리가 드래곤즈지만 나중에 변수로 둘 수 있을 듯하다.
+    name_of_dir = '드래곤즈 0617/'
+
+    Extract_data()
+    extractObject = Extract_data()
+    extractObject.summarize_csv(root_csv + name_of_dir, root_summarized +name_of_dir)
