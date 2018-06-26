@@ -1,5 +1,6 @@
 import glob
 import os
+import time
 
 
 class Converter:
@@ -82,13 +83,13 @@ class Converter:
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_och = self.check_slash(self, path_och)
-        path_csv = self.check_slash(self, path_csv)
-        name_of_dir = self.check_slash(self, name_of_dir)
+        path_och = self.check_slash(path_och)
+        path_csv = self.check_slash(path_csv)
+        name_of_dir = self.check_slash(name_of_dir)
         path_och = path_och + name_of_dir
         path_csv = path_csv + name_of_dir+'*.csv'
 
-        self.create_dir(convertObject, path_och)
+        self.create_dir(path_och)
 
         files_csv = glob.glob(path_csv)
 
@@ -120,8 +121,9 @@ class Converter:
 
 if __name__ == "__main__":
 
+    start_time = time.time()
     # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-    need_to_convert_dir = '드래곤즈 0617'
+    need_to_convert_dir = 'A-02_U18_인천'
     convertObject = Converter()
 
     # .och에서 .csv로의 변환을 원하는 경우
@@ -129,6 +131,14 @@ if __name__ == "__main__":
     root_csv_to_write = 'data/2. data_csv_format/'
     convertObject.convert_och_to_csv(root_och_to_read, root_csv_to_write, need_to_convert_dir)
 
+    # .csv에서 .och로의 변환을 원하는 경우
+    # 현재 기능 구현 확인을 위한 임의 path이고, 추후 필요에 따른 경로 변경 필요
+    root_csv_to_read = 'data/5. data_csv_cut_error/'
+    root_och_to_write = 'data/4. data_och_second_average/'
+    convertObject.convert_csv_to_och(root_csv_to_read, root_och_to_write, need_to_convert_dir)
+
+    end_time = time.time()-start_time
+    print('converter : '+str(format(end_time, '.6f'))+'sec\n')
 
     # .csv에서 .och로의 변환을 원하는 경우
     # 현재 기능 구현 확인을 위한 임의 path이고, 추후 필요에 따른 경로 변경 필요
