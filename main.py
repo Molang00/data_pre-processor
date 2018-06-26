@@ -1,4 +1,4 @@
-from module.controller.controller import Controller
+from module.controller.controller_module import Controller
 
 root_och = 'data/1. data_och_format/'
 root_csv = 'data/2. data_csv_format/'
