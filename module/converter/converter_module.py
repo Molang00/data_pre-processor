@@ -119,12 +119,8 @@ class Converter:
             file_to_read.close()
 
 
-# argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-convertObject = Converter()
-start_time = time.time()
-
 if __name__ == "__main__":
-
+    start_time = time.time()
     # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
     need_to_convert_dir = 'A-02_U18_인천'
     convertObject = Converter()
