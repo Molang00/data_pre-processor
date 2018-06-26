@@ -1,5 +1,6 @@
 import glob
 import os
+import time
 
 
 class EditData:
@@ -10,23 +11,36 @@ class EditData:
             if not os.path.exists(directory):
                 os.makedirs(directory)
         except OSError:
-            print('Error: Creating directory. '+directory)
+            print('Error: Creating directory. ' + directory)
 
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
 
         # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
+        if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
+            path_string = path_string + '/'
         return path_string
 
-    def time_comparision(self, target_list, comparision_target_smaller, comparision_target_larger):
+    def time_calculate(self, time_string, term_second_int):
+        time_list = time_string.split('.')
+        time_list.reverse()
+        time_list[0] = str(int(time_list[0]) + term_second_int)
+        if int(time_list[0]) >= 60:
+            time_list[1] = str(int(time_list[1]) + 1)
+            time_list[0] = str(int(time_list[0]) - 60)
+            if int(time_list[1]) >= 60:
+                time_list[2] = str(int(time_list[2]) + 1)
+                time_list[1] = str(int(time_list[1]) - 60)
+        time_list.reverse()
+        return time_list
+
+    def time_comparision(self, target_list, comparision_target_smaller, comparision_target_larger, term):
         # target_list 비교하고자 하는 목적의 시간을 string으로 저장
         # comparision_target_smaller 비교할 범위 중 작은 시간을 string으로 저장
         # comparision_target_larger 비교할 범위 중 큰 시간을 string으로 저장
-        list_value = target_list.split('.')
-        comparision_value_smaller = comparision_target_smaller.split('.')
-        comparision_value_larger = comparision_target_larger.split('.')
+        list_value = self.time_calculate(target_list, term)
+        comparision_value_smaller = self.time_calculate(comparision_target_smaller, 0)
+        comparision_value_larger = self.time_calculate(comparision_target_larger, term * 2)
 
         # 비교할 범위보다 작은 쪽으로 벗어나면 -1, 큰쪽으로 벗어나면 1, 범위에 포함되면 0을 return
         is_small = 1
@@ -42,7 +56,6 @@ class EditData:
                 is_large = 0
         return 0
 
-
     def cut_error(self, path_read_csv_folder, path_read_error_folder, path_write_folder, name_of_dir):
         # path_read_csv_folder 읽을 .csv파일이 저장된 폴더 경로를 string으로 저장
         # path_read_error_folder 읽을 error.csv파일이 저장된 폴더 경로를 string으로 저장
@@ -53,11 +66,12 @@ class EditData:
         path_read_csv_folder = self.check_slash(path_read_csv_folder)
         path_read_error_folder = self.check_slash(path_read_error_folder)
         path_write_folder = self.check_slash(path_write_folder)
-        path_read_csv_folder = path_read_csv_folder+name_of_dir+'*.csv'
-        path_read_error_folder = path_read_error_folder+name_of_dir+'error.csv'
-        path_write_folder = path_write_folder+name_of_dir
+        name_of_dir = self.check_slash(name_of_dir)
+        path_read_csv_folder = path_read_csv_folder + name_of_dir + '*.csv'
+        path_read_error_folder = path_read_error_folder + name_of_dir + 'error.csv'
+        path_write_folder = path_write_folder + name_of_dir
 
-        #파일을 쓸 위치에 폴더를 만들고 error.csv 열기
+        # 파일을 쓸 위치에 폴더를 만들고 error.csv 열기
         self.create_dir(path_write_folder)
         file_to_error_read = open(path_read_error_folder, 'r')
         read_error_values = file_to_error_read.readlines()
@@ -67,8 +81,8 @@ class EditData:
         files_read_csv = glob.glob(path_read_csv_folder)
 
         for file_read_csv in files_read_csv:
-            file_name = file_read_csv[len(path_read_csv_folder)-5:]
-            file_write_csv = path_write_folder+file_name
+            file_name = file_read_csv[len(path_read_csv_folder) - 5:]
+            file_write_csv = path_write_folder + file_name
 
             file_to_csv_read = open(file_read_csv, 'r')
             file_to_write = open(file_write_csv, 'w')
@@ -85,34 +99,50 @@ class EditData:
                     for time_value in csv_value_list[1:6]:
                         time_str = time_str + '.' + time_value
 
-                    comp_result = self.time_comparision(time_str, read_error_value[2], read_error_value[3])
+                    if read_error_value[4] == 'OverSpeed\n':
+                        term_int = 1
+                    if read_error_value[4] == 'OverDist\n':
+                        term_int = 1
+                    if read_error_value[4] == 'OutOfField\n':
+                        term_int = 2
+
+                    comp_result = self.time_comparision(time_str, read_error_value[2], read_error_value[3], term_int)
                     # 현재 읽은 줄의 시간이 error의 범위보다 큰쪽으로 벗어났다면 다음 error line에 대해 현재 읽은 줄을 확인
                     if comp_result == 1:
                         try:
                             index_csv = index_csv - 1
-                            index_error = index_error+1
+                            index_error = index_error + 1
                             read_error_value = read_error_values[index_error].split(',')
                         except:
                             # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                            read_error_value[0] = read_error_value[0]+'end'
+                            read_error_value[0] = read_error_value[0] + 'end'
                     if comp_result == -1:
                         file_to_write.write(read_csv_values[index_csv])
+
+                elif read_error_value[1] < file_name:
+                    index_error = index_error + 1
+                    read_error_value = read_error_values[index_error].split(',')
 
                 else:
                     file_to_write.write(read_csv_values[index_csv])
 
-                index_csv = index_csv+1
+                index_csv = index_csv + 1
 
             file_to_csv_read.close()
             file_to_write.close()
         file_to_error_read.close()
 
 
+start_time = time.time()
+
 # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-need_to_compute_dir = '드래곤즈 0617/'
+need_to_compute_dir = 'A-02_U18_인천'
 editdataObjtect = EditData()
 
 root_for_read_csv = 'data/2. data_csv_format/'
 root_for_read_error = 'data/30. data_noise/'
 root_for_write = 'data/5. data_csv_cut_error/'
 editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+
+end_time = time.time()-start_time
+print('edit_data : '+str(format(end_time, '.6f'))+'sec\n')
