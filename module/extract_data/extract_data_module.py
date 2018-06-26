@@ -27,6 +27,7 @@ class Extract_data:
         print(files_csv)
         # csv파일의 첫줄에 들어갈 정보들을 순서대로 입력해주는 write_order
         write_order = 'year,month,day,hour,minute,second,longitude,latitude,speed,distance'
+
         #csv파일들을 하나하나 생성한 후 해당 값들을 적어주는 부분이다.
         for file_csv in files_csv:
 
@@ -93,6 +94,7 @@ class Extract_data:
                     check_time_temp = check_time
                     value_temp = value
                     count = 1
+
             # 이부분은 반복문 안과 같지만 마지막 줄을 적어주기 위해 한줄을 추가하여 마지막줄의 연산까지 하는 것이다.
             for time_idx, time_string in enumerate(check_time_temp[:6]):
                 if time_idx == 0:

@@ -2,7 +2,7 @@
 from module.converter.converter_module import Converter
 from module.editdata.editdata_module import EditData
 from module.extract_data.extract_data_module import Extract_data
-from module.noisefinder.noisefinder_module import NoiseFinder
+from module.findnoise.findnoise_module import NoiseFinder
 import os
 
 
@@ -42,7 +42,8 @@ class Controller:
 
         pass
 
-    def filter_process(self,path_root_folder_input, path_root_folder_output, name_folder):
+    def filter_process(self,path_root_folder_input, path_read_field_folder, path_root_folder_output1,
+                       path_root_for_read_error, path_root_folder_output2, name_folder):
         '''
         :param path_root_folder_input:
         :param path_root_folder_output:
@@ -50,7 +51,11 @@ class Controller:
         :return:
         '''
         object_noise = NoiseFinder()
-        object_noise.find_noise_in_data(path_read_folder=path_root_folder_input, path_write_folder=path_root_folder_output, name_of_dir=name_folder)
+        object_noise.find_noise_in_data(path_read_folder=path_root_folder_input, path_read_field_folder=path_read_field_folder, path_write_folder=path_root_folder_output1, name_of_dir=name_folder)
+
+        object_edit = EditData()
+        object_edit.cut_error(path_root_folder_input, path_root_for_read_error,path_root_folder_output2, name_folder)
+
 
 
 
