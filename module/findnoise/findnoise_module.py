@@ -81,8 +81,7 @@ class NoiseFinder:
         new_D = expansion(pointD, center, expansion_rate)
         return new_A, new_B, new_C, new_D
 
-
-    def find_noise_in_data(self, path_read_folder, path_read_field_folder, path_write_folder, name_of_dir):
+    def find_noise_in_data(self, path_read_folder, path_read_field_folder, path_write_folder, name_of_dir, ck_speed=True, ck_dist=True, ck_field=True):
         # path_read_folder 읽을 파일이 저장된 path를 string으로 저장
         # path_write_folder 파일을 쓰고자 하는 path를 string으로 저장
         # nmae_of_dir 읽을 파일과 쓰고자 하는 파일의 dir name을 string으로 저장
@@ -105,31 +104,35 @@ class NoiseFinder:
 
         files_read = glob.glob(path_read_folder)
         for file_read in files_read:
+            file_read = file_read.replace('\\','/')
             file_to_read = open(file_read, 'r')
 
             read_values = file_to_read.readlines()
 
             error_list = []
-            last_speed = 0
-            id_speed = -1
-            last_dist = 0
-            id_dist = -1
-            last_field = 0
-            id_field = -1
-            try:
-                read_field = file_to_read_field.readline()
-                read_field_list = read_field.split(',')
-                lonA, latA, lonB, latB, lonC, latC, lonD, latD = read_field_list[4:]
-                pointA = (float(lonA[1:]), float(latA[1:]))
-                pointB = (float(lonB[1:]), float(latB[1:]))
-                pointC = (float(lonC[1:]), float(latC[1:]))
-                pointD = (float(lonD[1:]), float(latD[1:len(latD)-2]))
-                pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.2)
-            except:
-                pointA = (0,0)
-                pointB = (0,0)
-                pointC = (0,0)
-                pointD = (0,0)
+            if ck_speed:
+                last_speed = 0
+                id_speed = -1
+            if ck_dist:
+                last_dist = 0
+                id_dist = -1
+            if ck_field:
+                last_field = 0
+                id_field = -1
+                try:
+                    read_field = file_to_read_field.readline()
+                    read_field_list = read_field.split(',')
+                    lonA, latA, lonB, latB, lonC, latC, lonD, latD = read_field_list[4:]
+                    pointA = (float(lonA[1:]), float(latA[1:]))
+                    pointB = (float(lonB[1:]), float(latB[1:]))
+                    pointC = (float(lonC[1:]), float(latC[1:]))
+                    pointD = (float(lonD[1:]), float(latD[1:len(latD)-2]))
+                    pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.2)
+                except:
+                    pointA = (0, 0)
+                    pointB = (0, 0)
+                    pointC = (0, 0)
+                    pointD = (0, 0)
             for value_list in read_values[1:]:
                 value_csv_list = value_list.split(',')
 
@@ -138,46 +141,50 @@ class NoiseFinder:
                     time_str = time_str + '.' + time_csv_string
 
                 speed_float = float(value_csv_list[8])
+                if ck_speed:
+                    # speed가 38보다 크게 변경된 순간에는 순간에는 list 형태로 start_time append
+                    # speed가 38보다 작게 변경된 순간에는 start_time을 append한 위치에 end_time과 error_code 작성
+                    if speed_float >= 38.0 and value_list != read_values[len(read_values)-1]:
+                        if last_speed == 0:
+                            last_speed = 1
+                            error_list.append(time_str)
+                            id_speed = len(error_list)-1
+                    else:
+                        if last_speed == 1:
+                            last_speed = 0
+                            error_list[id_speed] = error_list[id_speed] + ',' + time_str + ',OverSpeed'
 
-                # speed가 38보다 크게 변경된 순간에는 start_time_speed를 set
-                # speed가 38보다 작게 변경된 순간에는 list에 string형태로 append
-                if speed_float >= 38.0 and value_list != read_values[len(read_values)-1]:
-                    if last_speed == 0:
-                        last_speed = 1
-                        error_list.append(time_str)
-                        id_speed = len(error_list)-1
-                else:
-                    if last_speed == 1:
-                        last_speed = 0
-                        error_list[id_speed] = error_list[id_speed] + ',' + time_str + ',OverSpeed'
-
-                # 1초에 이동한 dist가 15m보다 크게 변경된 순간에는 start_time_dist를 set
-                # 1초에 이동한 dist가 15m보다 작게 변경된 순간에는 list에 string형태로 append
                 dist_float = float(value_csv_list[9])
-                if dist_float >= 15 and value_list != read_values[len(read_values)-1]:
-                    if last_dist == 0:
-                        last_dist = 1
-                        error_list.append(time_str)
-                        id_dist = len(error_list)-1
-                else:
-                    if last_dist == 1:
-                        last_dist = 0
-                        error_list[id_dist] = error_list[id_dist] + ',' + time_str + ',OverDist'
+                if ck_dist:
+                    # 1초에 이동한 dist가 15m보다 크게 변경된 순간에는 list 형태로 start_time append
+                    # 1초에 이동한 dist가 15m보다 작게 변경된 순간에는 start_time을 append한 위치에 end_time과 error_code 작성
+                    if dist_float >= 15 and value_list != read_values[len(read_values)-1]:
+                        if last_dist == 0:
+                            last_dist = 1
+                            error_list.append(time_str)
+                            id_dist = len(error_list)-1
+                    else:
+                        if last_dist == 1:
+                            last_dist = 0
+                            error_list[id_dist] = error_list[id_dist] + ',' + time_str + ',OverDist'
 
-                longitude_float = float(value_csv_list[6])
-                latitude_float = float(value_csv_list[7])
-                pointP = (longitude_float, latitude_float)
+                if ck_field:
+                    # field의 1.2배 크기 밖으로 나간 순간에는 list 형태로 start_time append
+                    # field의 1.2배 크기 안으로 들어간 순간에는 start_time을 append한 위치에 end_time과 error_code 작성
+                    longitude_float = float(value_csv_list[6])
+                    latitude_float = float(value_csv_list[7])
+                    pointP = (longitude_float, latitude_float)
 
-                if (not self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
-                        and value_list != read_values[len(read_values) - 1]:
-                    if last_field == 0:
-                        last_field = 1
-                        error_list.append(time_str)
-                        id_field = len(error_list)-1
-                else:
-                    if last_field == 1:
-                        last_field = 0
-                        error_list[id_field] = error_list[id_field] + ',' + time_str + ',OutOfField'
+                    if (not self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
+                            and value_list != read_values[len(read_values) - 1]:
+                        if last_field == 0:
+                            last_field = 1
+                            error_list.append(time_str)
+                            id_field = len(error_list)-1
+                    else:
+                        if last_field == 1:
+                            last_field = 0
+                            error_list[id_field] = error_list[id_field] + ',' + time_str + ',OutOfField'
 
             # file에서 읽어온 정보를 이용해 speed_error를 찾고 error.csv에 쓰기
             for error_str in error_list:
@@ -192,7 +199,7 @@ start_time = time.time()
 
 if __name__ == "__main__":
     # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-    need_to_compute_dir = 'A-02_U18_인천'
+    need_to_compute_dir = '드래곤즈 0626 경기'
     noisefinderObject = NoiseFinder()
 
     root_for_read = 'data/3. data_csv_second_average/'
