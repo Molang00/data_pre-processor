@@ -187,7 +187,6 @@ class NoiseFinder:
         file_to_read_field.close()
         file_to_write.close()
 
-
 start_time = time.time()
 
 if __name__ == "__main__":
