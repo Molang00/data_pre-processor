@@ -4,7 +4,6 @@ import math
 import glob
 import os
 
-
 # gps좌표를 meter scale의 distance로 바꾸어준다
 class Find_field_csv:
 

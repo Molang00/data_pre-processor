@@ -3,6 +3,7 @@ from module.converter.converter_module import Converter
 from module.editdata.editdata_module import EditData
 from module.extract_data.extract_data_module import Extract_data
 from module.findnoise.findnoise_module import NoiseFinder
+from helper.find_field_csv import Find_field_csv
 import os
 
 
@@ -24,34 +25,45 @@ class Controller:
         else:
             object_converter.convert_csv_to_och(path_root_folder_input, path_root_folder_output,
                                                 name_of_dir=name_folder)
-        return
 
 
-
-    def extract_process(self, path_root_folder_input, path_root_folder_output, name_folder):
+    def extract_process(self, path_root_folder_input, path_root_folder_output_for_min_average, path_field_info,path_root_folder_output_for_field, name_folder):
         '''
         :param path_root_folder_input:
         :param path_root_folder_output:
         :param name_folder:
         :return:
         '''
+
+
+
+
         object_extract = Extract_data()
         path_csv_folder = os.path.join(path_root_folder_input,name_folder).replace("\\", "/")
-        path_output_folder = os.path.join(path_root_folder_output,name_folder).replace("\\", "/")
-        object_extract.summarize_csv(path_csv_folder, path_output_folder)
+        path_output_folder_for_min_average = os.path.join(path_root_folder_output_for_min_average, name_folder).replace("\\", "/")
+        path_output_folder_for_field = os.path.join(path_root_folder_output_for_field, name_folder).replace("\\", "/")
 
-        pass
+        object_extract.summarize_csv(path_csv_folder, path_output_folder_for_min_average)
+
+        object_find_field = Find_field_csv()
+        object_find_field.find_field_csv_folder(path_csv_folder, path_field_info, path_output_folder_for_field+"/")
+
+
+
+
 
     def filter_process(self,path_root_folder_input, path_read_field_folder, path_root_folder_output1,
                        path_root_for_read_error, path_root_folder_output2, name_folder):
+
         '''
         :param path_root_folder_input:
         :param path_root_folder_output:
         :param name_folder:
         :return:
         '''
+
         object_noise = NoiseFinder()
-        object_noise.find_noise_in_data(path_read_folder=path_root_folder_input, path_read_field_folder=path_read_field_folder, path_write_folder=path_root_folder_output1, name_of_dir=name_folder)
+        object_noise.find_noise_in_data(path_root_folder_input, path_read_field_folder, path_root_folder_output1, name_folder)
 
         object_edit = EditData()
         object_edit.cut_error(path_root_folder_input, path_root_for_read_error,path_root_folder_output2, name_folder)
