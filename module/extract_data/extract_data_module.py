@@ -121,3 +121,4 @@ name_of_dir = '드래곤즈 0617/'
 Extract_data()
 extractObject = Extract_data()
 extractObject.summarize_csv(root_csv + name_of_dir, root_summarized +name_of_dir)
+
