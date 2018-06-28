@@ -38,6 +38,11 @@ class EditData:
         # target_list 비교하고자 하는 목적의 시간을 string으로 저장
         # comparision_target_smaller 비교할 범위 중 작은 시간을 string으로 저장
         # comparision_target_larger 비교할 범위 중 큰 시간을 string으로 저장
+
+        # term이 -1인 경우는 본 에러를 확인하지 않겠다는 뜻이므로 다음에러로 넘어가는 1을 return
+        if term == -1:
+            return 1
+
         list_value = self.time_calculate(target_list, term)
         comparision_value_smaller = self.time_calculate(comparision_target_smaller, 0)
         comparision_value_larger = self.time_calculate(comparision_target_larger, term * 2)
@@ -56,7 +61,7 @@ class EditData:
                 is_large = 0
         return 0
 
-    def cut_error(self, path_read_csv_folder, path_read_error_folder, path_write_folder, name_of_dir):
+    def cut_error(self, path_read_csv_folder, path_read_error_folder, path_write_folder, name_of_dir, ck_field=True, ck_dist=True, ck_speed=True):
         # path_read_csv_folder 읽을 .csv파일이 저장된 폴더 경로를 string으로 저장
         # path_read_error_folder 읽을 error.csv파일이 저장된 폴더 경로를 string으로 저장
         # path_write_folder error범위를 제외한 부분을 .csv로 저장할 폴더 경로를 string으로 저장
@@ -99,11 +104,12 @@ class EditData:
                     for time_value in csv_value_list[1:6]:
                         time_str = time_str + '.' + time_value
 
-                    if read_error_value[4] == 'OverSpeed\n':
+                    term_int = -1
+                    if read_error_value[4] == 'OverSpeed\n' and ck_speed:
                         term_int = 1
-                    if read_error_value[4] == 'OverDist\n':
+                    if read_error_value[4] == 'OverDist\n' and ck_dist:
                         term_int = 1
-                    if read_error_value[4] == 'OutOfField\n':
+                    if read_error_value[4] == 'OutOfField\n' and ck_field:
                         term_int = 2
 
                     comp_result = self.time_comparision(time_str, read_error_value[2], read_error_value[3], term_int)
@@ -113,15 +119,21 @@ class EditData:
                             index_csv = index_csv - 1
                             index_error = index_error + 1
                             read_error_value = read_error_values[index_error].split(',')
-                        except:
+                        except IndexError:
                             # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                            read_error_value[0] = read_error_value[0] + 'end'
+                            read_error_value[1] = read_error_value[1] + 'end'
                     if comp_result == -1:
                         file_to_write.write(read_csv_values[index_csv])
 
+                # error의 정보가 현재 읽는 중인 file_name보다 작다면 error의 index를 증가시킨다.
                 elif read_error_value[1] < file_name:
-                    index_error = index_error + 1
-                    read_error_value = read_error_values[index_error].split(',')
+                    try:
+                        index_csv = index_csv - 1
+                        index_error = index_error + 1
+                        read_error_value = read_error_values[index_error].split(',')
+                    except IndexError:
+                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
+                        read_error_value[1] = read_error_value[1]+'end'
 
                 else:
                     file_to_write.write(read_csv_values[index_csv])
