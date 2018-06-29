@@ -13,7 +13,8 @@ root_for_result_och = 'data/100. data_result'
 path_all_field_info = 'helper/output.csv'
 
 
-need_to_convert_dir = 'och'
+#need_to_convert_dir = 'och'
+need_to_convert_dir = input("폴더명을 입력하십시오")
 
 start_time = time.time()
 
