@@ -1,6 +1,7 @@
-from module.controller.controller_module import Controller
-import time
 
+import time
+'''
+from module.controller.controller_module import Controller
 root_och = 'data/1. data_och_format/'
 root_csv = 'data/2. data_csv_format/'
 root_summarized = 'data/3. data_csv_second_average/'
@@ -30,3 +31,13 @@ print("--- %s seconds ---" % (time.time() - start_time))
 object_controller.convert_process(root_for_editted_file, root_for_result_och, need_to_convert_dir,
                                   process_type="csv_to_och")
 print("--- %s seconds ---" % (time.time() - start_time))
+'''
+
+from PyQt5.QtWidgets import *
+from module.controller.controller_module import Controller
+import sys
+
+app = QApplication(sys.argv)
+myWindow = Controller()
+myWindow.show()
+app.exec_()
