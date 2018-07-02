@@ -1,6 +1,6 @@
 
 from module.converter.converter_module import Converter
-from module.editdata.editdata_module import EditData
+from module.editdata.edit_data_module import EditData
 from module.extract_data.extract_data_module import Extract_data
 from module.findnoise.findnoise_module import NoiseFinder
 from helper.find_field_csv import Find_field_csv
