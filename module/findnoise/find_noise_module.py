@@ -23,18 +23,6 @@ class NoiseFinder:
             path_string = path_string+'/'
         return path_string
 
-    # gps좌표를 meter scale의 distance로 바꾸어준다
-    def measure(self, lat1, lon1, lat2, lon2):
-        R = 6378.137
-        dLat = (lat1 - lat2) * math.pi / 180
-        dLon = (lon1 - lon2) * math.pi / 180
-        a = math.sin(dLat / 2) * math.sin(dLat / 2) + \
-            math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
-            math.sin(dLon / 2) * math.sin(dLon / 2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        d = R * c
-        return d * 1000
-
     def checkPointInRectangle(self, pointP, pointA, pointB, pointC, pointD):
         def sign(pointP, pointA, pointB):
             # distinguish side of point, criteria: line AB
@@ -53,27 +41,6 @@ class NoiseFinder:
         insideSquare = (b1 and b2 and b3 and b4) or (not (b1 or b2 or b3 or b4))
 
         return not insideSquare
-
-    def checkPointInTriangle(self, pointP, pointA, pointB, pointC):
-        '''return True if inside, return False if outside Triangle '''
-
-        def sign(pointP, pointA, pointB):
-            # distinguish side of point, criteria: line AB
-            updown = (pointP[0] - pointB[0]) * (pointA[1] - pointB[1]) - (
-                    pointP[1] - pointB[1]) * (pointA[0] - pointB[0])
-            if updown >= 0:
-                output = True
-            else:
-                output = False
-            return output
-
-        b1 = sign(pointP, pointA, pointB)
-        b2 = sign(pointP, pointB, pointC)
-        b3 = sign(pointP, pointC, pointA)
-
-        insideTriangle = ((b1 == b2) and (b2 == b3))
-
-        return insideTriangle
 
     def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate):
 
