@@ -120,20 +120,20 @@ class EditData:
                             index_error = index_error + 1
                             read_error_value = read_error_values[index_error].split(',')
                         except IndexError:
-                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                            read_error_value[1] = read_error_value[1] + 'end'
+                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력
+                            file_to_write.write(read_csv_values[index_csv])
                     if comp_result == -1:
                         file_to_write.write(read_csv_values[index_csv])
 
                 # error의 정보가 현재 읽는 중인 file_name보다 작다면 error의 index를 증가시킨다.
-                elif read_error_value[1] < file_name:
+                elif read_error_value[1] < file_name and index_error < len(read_error_values):
                     try:
                         index_csv = index_csv - 1
                         index_error = index_error + 1
                         read_error_value = read_error_values[index_error].split(',')
                     except IndexError:
-                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                        read_error_value[1] = read_error_value[1]+'end'
+                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력
+                        file_to_write.write(read_csv_values[index_csv])
 
                 else:
                     file_to_write.write(read_csv_values[index_csv])
@@ -154,6 +154,15 @@ editdataObjtect = EditData()
 root_for_read_csv = 'data/2. data_csv_format/'
 root_for_read_error = 'data/30. data_noise/'
 root_for_write = 'data/5. data_csv_cut_error/'
+need_to_compute_dir = '20180626_훈련_H_전남 드래곤즈/'
+editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+need_to_compute_dir = '20180626_2018 R리그 - 10R (v경남)_H_전남 드래곤즈/'
+editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+need_to_compute_dir = '20180625_훈련_A_포항 스틸러스/'
+editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+need_to_compute_dir = '20180622_훈련_A_전남 드래곤즈/'
+editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
+need_to_compute_dir = '20180613_훈련 2차_H_포항 스틸러스/'
 editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
 
 end_time = time.time()-start_time
