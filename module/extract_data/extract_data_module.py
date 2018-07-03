@@ -16,7 +16,6 @@ class Extract_data:
 
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
-
         # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
         if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
             path_string = path_string + '/'
@@ -121,3 +120,15 @@ class Extract_data:
             file_to_write.write('\n')
 
             file_to_read.close()
+
+
+if __name__ == "__main__":
+    root_csv = 'data/2. data_csv_format/'
+    root_summarized = 'data/3. data_csv_second_average/'
+    name_of_dir = '드래곤즈 0617/'
+
+    extractObject = extract_data()
+    extractObject.create_dir(root_summarized+name_of_dir)
+    print("A")
+    extractObject.summarize_csv(root_csv + name_of_dir+'*.csv', root_summarized + name_of_dir)
+    print("B")
