@@ -1,6 +1,7 @@
 import glob
 import os
 import time
+from helper.gp_convert.gp2ochconverter import *
 
 
 class Converter:
@@ -20,6 +21,29 @@ class Converter:
         if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
             path_string = path_string+'/'
         return path_string
+
+    def convert_gp_to_och(self, path_gp, path_och, name_of_dir):
+        # path_gp 읽을 gp파일이 저장된 path를 string으로 저장
+        # path_och och파일을 쓰고자 하는 path를 string으로 저장
+        # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
+
+        path_gp = self.check_slash(path_gp)
+        path_och = self.check_slash(path_och)
+        name_of_dir = self.check_slash(name_of_dir)
+        path_gp = path_gp + name_of_dir + '*.gp'
+        path_och = path_och + name_of_dir
+
+        self.create_dir(path_och)
+
+        files_gp = glob.glob(path_gp)
+
+
+        for file_gp in files_gp:
+            file_och = path_och+file_gp[len(path_gp)-4:]
+            file_och = file_och[:len(file_och)-2]+'och'
+            # 각 파일 마다 initialize 하여 GpToOchConvert Object를 생성 후 convert 실행
+            GpToOchConverterObject = GpToOchConverter()
+            GpToOchConverterObject.convertToOchFile(file_gp, file_och)
 
     def convert_och_to_csv(self, path_och, path_csv, name_of_dir):
         # path_och 읽을 och파일이 저장된 path를 string으로 저장
@@ -122,8 +146,13 @@ class Converter:
 if __name__ == "__main__":
     start_time = time.time()
     # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-    need_to_convert_dir = 'A-02_U18_인천'
+    need_to_convert_dir = 'A-46_U18_성남'
     convertObject = Converter()
+
+    #.gp에서 .och로의 변환을 원하는 경우
+    root_gp_to_read = 'data/0. data_gp_format/'
+    root_och_to_write = 'data/1. data_och_format/'
+    convertObject.convert_gp_to_och(root_gp_to_read, root_och_to_write, need_to_convert_dir)
 
     # .och에서 .csv로의 변환을 원하는 경우
     root_och_to_read = 'data/1. data_och_format/'
