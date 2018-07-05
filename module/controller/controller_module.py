@@ -79,6 +79,7 @@ class Controller(QMainWindow, form_class):
 
     def connect_function_and_widget(self):
 
+        root_gp =  "0. data_gp_format"
         root_och = 'data/1. data_och_format/'
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
@@ -95,13 +96,15 @@ class Controller(QMainWindow, form_class):
         self.button_widget_list[2].clicked.connect(lambda : self.filter_process(root_summarized, root_for_field, root_for_noise,
                                          root_csv, root_for_editted_file, self.process_clicked_list))
         self.button_widget_list[3].clicked.connect(lambda : self.convert_process(root_for_editted_file, root_for_result_och, self.process_clicked_list,
-                                          process_type="csv_to_och"))
-        arg_list = [root_och, root_csv, self.process_clicked_list,root_csv, root_summarized, path_all_field_info, root_for_field,
-                                                                        self.process_clicked_list,root_summarized, root_for_field, root_for_noise,
-                                         root_csv, root_for_editted_file, self.process_clicked_list,root_for_editted_file, root_for_result_och, self.process_clicked_list,"csv_to_och"]
+                                          True, True, False))
+
+        arg_list = [root_gp, root_och, root_csv, self.process_clicked_list,
+                    root_csv, root_summarized, path_all_field_info, root_for_field,self.process_clicked_list,
+                    root_summarized, root_for_field, root_for_noise,root_csv, root_for_editted_file, self.process_clicked_list,
+                    root_for_editted_file, root_for_result_och, self.process_clicked_list]
         self.button_widget_list[4].clicked.connect(lambda : self.all_process(arg_list))
 
-    def convert_process(self, path_root_folder_input, path_root_folder_output, name_folder_list, process_type="och_to_csv"):
+    def convert_process(self, path_root_folder_gp_input, path_root_folder_och_input, path_root_folder_output, name_folder_list, is_gp_to_och=True, is_och_to_csv=True, is_csv_to_och=False):
         '''
             :param path_root_folder_input:  string,     'data/2. data_csv_format’,     데이터를 처리할 폴더가 담겨있는 root 경로
             :param path_root_folder_output: string,     'data/5.data_error_removed’,   결과를 출력할 폴더가 담길 root 경로
@@ -112,12 +115,18 @@ class Controller(QMainWindow, form_class):
 
         for name_folder in name_folder_list:
             object_converter= Converter()
-            if process_type == "och_to_csv":
-                object_converter.convert_och_to_csv(path_root_folder_input, path_root_folder_output,
+
+            if is_gp_to_och:
+                object_converter.convert_gp_to_och(path_root_folder_gp_input, path_root_folder_output,
                                                     name_of_dir=name_folder)
-            else:
-                object_converter.convert_csv_to_och(path_root_folder_input, path_root_folder_output,
+            if is_och_to_csv:
+                object_converter.convert_och_to_csv(path_root_folder_och_input, path_root_folder_output,
                                                     name_of_dir=name_folder)
+            if is_csv_to_och:
+                object_converter.convert_csv_to_och(path_root_folder_och_input, path_root_folder_output,
+                                                    name_of_dir=name_folder)
+
+
 
 
     def extract_process(self, path_root_folder_input, path_root_folder_output_for_min_average, path_field_info,path_root_folder_output_for_field, name_folder_list):
@@ -166,10 +175,12 @@ class Controller(QMainWindow, form_class):
 
     def all_process(self, arg_list):
         print("all process start")
-        self.convert_process(arg_list[0],arg_list[1], self.process_clicked_list)
-        self.extract_process(arg_list[3],arg_list[4],arg_list[5],arg_list[6], self.process_clicked_list)
-        self.filter_process(arg_list[8],arg_list[9],arg_list[10],arg_list[11],arg_list[12], self.process_clicked_list)
-        self.convert_process(arg_list[14],arg_list[15], self.process_clicked_list, arg_list[17])
+
+        self.convert_process(arg_list[0], arg_list[1], arg_list[2], self.process_clicked_list)
+        self.extract_process(arg_list[4],arg_list[5],arg_list[6],arg_list[7], self.process_clicked_list)
+        self.filter_process(arg_list[9],arg_list[10],arg_list[11],arg_list[12],arg_list[13], self.process_clicked_list)
+        self.convert_process(arg_list[15],arg_list[16], self.process_clicked_list, False, False, True)
+
         print("all process end")
 
 
