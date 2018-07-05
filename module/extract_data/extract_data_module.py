@@ -14,8 +14,17 @@ class Extract_data:
         d = R * c
         return d * 1000
 
+    def check_slash(self, path_string):
+        # path_string 원하는 경로를 string으로 저장
+        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
+        if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
+            path_string = path_string + '/'
+        return path_string
+
     # csv파일의 시간 기록단위를 1hz로 변경해주는 method
     def summarize_csv(self, path_csv_folder, path_output_folder):
+        path_csv_folder=self.check_slash(path_csv_folder)
+        path_output_folder=self.check_slash(path_output_folder)
         #디렉토리가 없으면은 생성해준다.
         try:
             if not os.path.exists(path_output_folder):
@@ -24,10 +33,8 @@ class Extract_data:
             print('Error: Creating directory.'+ path_output_folder)
         #glob.glob로 해당경로상에 존재하는 .csv파일의 경로를 읽어들여 list로 정리
         files_csv = glob.glob(path_csv_folder + '*.csv')
-        print(files_csv)
         # csv파일의 첫줄에 들어갈 정보들을 순서대로 입력해주는 write_order
         write_order = 'year,month,day,hour,minute,second,longitude,latitude,speed,distance'
-
         #csv파일들을 하나하나 생성한 후 해당 값들을 적어주는 부분이다.
         for file_csv in files_csv:
 
@@ -123,6 +130,10 @@ if __name__ == "__main__":
     # 현재는 디렉토리가 드래곤즈지만 나중에 변수로 둘 수 있을 듯하다.
     name_of_dir = '드래곤즈 0617/'
 
-    Extract_data()
+
     extractObject = Extract_data()
-    extractObject.summarize_csv(root_csv + name_of_dir, root_summarized +name_of_dir)
+    extractObject.create_dir(root_summarized+name_of_dir)
+    print("A")
+    extractObject.summarize_csv(root_csv + name_of_dir+'*.csv', root_summarized + name_of_dir)
+    print("B")
+
