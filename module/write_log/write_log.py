@@ -245,20 +245,20 @@ class Write_log:
         end1_minute = -1
         end2_hour = -1
         end2_minute = -1
-
-        while (i < len(time_table)):  # start,end정하는 알고리즘
+        #start 타이밍이랑 end타이밍 정할때도 이거 좀 똑바로해야함 start를잡아야함
+        print(time_table)
+        while (i < len(time_table)-2):  # start,end정하는 알고리즘
             num_playing_1 = time_table[i][2]
             if i < len(time_table) - 1:
                 num_playing_2 = time_table[i + 1][2]
             else:
                 num_playing_2 = time_table[i][2]
 
-            if (num_playing_2 - num_playing_1) > 8 and k == 0:  # 활동중이아니다가 활동중인 시간체크 가장먼저->전반시작
+            if (num_playing_2 - num_playing_1) > 6 and k == 0 and time_table[i+1][2]>9 and time_table[i+2][2]>9:  # 활동중이아니다가 활동중인 시간체크 가장먼저->전반시작
                 start1_hour = time_table[i + 1][0]
                 start1_minute = time_table[i + 1][1]
                 k = 1
-            if (
-                    num_playing_1 - num_playing_2) > 8 and l == 0 and timestp_fh > 45:  # 활동중이다가 활동중이 아니게 되면서 시간이 45분이상지난경우->전반끝
+            if (num_playing_1 - num_playing_2) < 3 and l == 0 and timestp_fh > 45 and time_table[i+1][2]<9 and time_table[i+2][2]<9:  # 활동중이다가 활동중이 아니게 되면서 시간이 45분이상지난경우->전반끝
                 end1_hour = time_table[i + 1][0]
                 end1_minute = time_table[i + 1][1]
                 l = 1
@@ -266,13 +266,12 @@ class Write_log:
             if l == 1 and p == 0:  # 전반이 끝난 후에 후반시작 전까지 휴식시간 체크
                 timestp_break = timestp_break + 1
 
-            if timestp_break > 7 and (num_playing_2 - num_playing_1) > 8 and p == 0:  # 휴식이 끝난 후 활동이 시작하면 start2로 지정
+            if timestp_break > 5 and (num_playing_2 - num_playing_1) > 6 and p == 0 and time_table[i+1][2]>9 and time_table[i+2][2]>9:  # 휴식이 끝난 후 활동이 시작하면 start2로 지정
                 start2_hour = time_table[i + 1][0]
                 start2_minute = time_table[i + 1][1]
                 p = 1
 
-            if p == 1 and (num_playing_1 - num_playing_2) > 6 and (
-                    timestp_sh > 45 and timestp_sh < 60) and q == 0:  # start2가 정해지고 나서 활동중이다가 활동중이 아니게 되면서 45분이상 흐르면 후반끝지정
+            if p == 1 and (num_playing_1 - num_playing_2) < 3 and (timestp_sh > 45 and timestp_sh < 60) and q == 0 and time_table[i+1][2]<9 and time_table[i+2][2]<9:  # start2가 정해지고 나서 활동중이다가 활동중이 아니게 되면서 45분이상 흐르면 후반끝지정
                 end2_hour = time_table[i][0]
                 end2_minute = time_table[i][1]
                 q = 1
@@ -372,8 +371,7 @@ class Write_log:
         i = 0
         while i < len(pout_fh):
             file_to_write.write(
-                'SUB,' + str(pout_fh[i][1]) + ':' + str(pout_fh[i][2]) + ':00,' + pout_fh[i][0] + ',' + pin_fh[i][
-                    0] + '\n')
+                'SUB,' + str(pout_fh[i][1]) + ':' + str(pout_fh[i][2]) + ':00,' + pout_fh[i][0] + ',' + pin_fh[i][0] + '\n')
             i = i + 1
         file_to_write.write('END1,' + str(end1_hour) + ':' + str(end1_minute) + ':00' + '\n')
         i = 0
@@ -385,8 +383,7 @@ class Write_log:
         i = 0
         while i < len(pout_sh):
             file_to_write.write(
-                'SUB,' + str(pout_sh[i][1]) + ':' + str(pout_sh[i][2]) + ':00,' + pout_sh[i][0] + ',' + pin_sh[i][
-                    0] + '\n')
+                'SUB,' + str(pout_sh[i][1]) + ':' + str(pout_sh[i][2]) + ':00,' + pout_sh[i][0] + ',' + pin_sh[i][0] + '\n')
             i = i + 1
         file_to_write.write('END2,' + str(end2_hour) + ':' + str(end2_minute) + ':00' + '\n')
 
