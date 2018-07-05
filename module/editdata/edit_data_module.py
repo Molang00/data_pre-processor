@@ -120,20 +120,20 @@ class EditData:
                             index_error = index_error + 1
                             read_error_value = read_error_values[index_error].split(',')
                         except IndexError:
-                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                            read_error_value[1] = read_error_value[1] + 'end'
+                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력
+                            file_to_write.write(read_csv_values[index_csv])
                     if comp_result == -1:
                         file_to_write.write(read_csv_values[index_csv])
 
                 # error의 정보가 현재 읽는 중인 file_name보다 작다면 error의 index를 증가시킨다.
-                elif read_error_value[1] < file_name:
+                elif read_error_value[1] < file_name and index_error < len(read_error_values):
                     try:
                         index_csv = index_csv - 1
                         index_error = index_error + 1
                         read_error_value = read_error_values[index_error].split(',')
                     except IndexError:
-                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력할 수 있게 file_name과 다른값으로 지정
-                        read_error_value[1] = read_error_value[1]+'end'
+                            # 마지막 error의 범위를 벗어났을 경우 .csv 파일의 나머지를 모두 출력
+                        file_to_write.write(read_csv_values[index_csv])
 
                 else:
                     file_to_write.write(read_csv_values[index_csv])
@@ -143,19 +143,3 @@ class EditData:
             file_to_csv_read.close()
             file_to_write.close()
         file_to_error_read.close()
-
-if __name__ == "main":
-
-    start_time = time.time()
-
-    # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-    need_to_compute_dir = 'A-02_U18_인천'
-    editdataObjtect = EditData()
-
-    root_for_read_csv = 'data/2. data_csv_format/'
-    root_for_read_error = 'data/30. data_noise/'
-    root_for_write = 'data/5. data_csv_cut_error/'
-    editdataObjtect.cut_error(root_for_read_csv, root_for_read_error, root_for_write, need_to_compute_dir)
-
-    end_time = time.time()-start_time
-    print('edit_data : '+str(format(end_time, '.6f'))+'sec\n')
