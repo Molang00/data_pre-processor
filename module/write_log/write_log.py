@@ -1,8 +1,21 @@
 import glob
 import math
-from collections import Counter
 
 class Write_log:
+
+    def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate=1):
+
+        def expansion(point, center, rate):
+            x = center[0] + (point[0] - center[0]) * rate
+            y = center[1] + (point[1] - center[1]) * rate
+            return (x, y)
+
+        center = ((pointA[0] + pointB[0] + pointC[0] + pointD[0]) / 4, (pointA[1] + pointB[1] + pointC[1] + pointD[1]) / 4)
+        new_A = expansion(pointA, center, expansion_rate)
+        new_B = expansion(pointB, center, expansion_rate)
+        new_C = expansion(pointC, center, expansion_rate)
+        new_D = expansion(pointD, center, expansion_rate)
+        return new_A, new_B, new_C, new_D
 
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
@@ -74,6 +87,8 @@ class Write_log:
             pointC = (lonC, latC)
             pointD = (lonD, latD)
 
+            pointA,pointB,pointC,pointD=self.expand_field(pointA,pointB,pointC,pointD,1.2)
+
             if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
                 infield=True
 
@@ -100,8 +115,10 @@ class Write_log:
 
         return p
 
-    def detect_playing(self,path_csv_folder,path_field_info):
+    def detect_playing(self,path_csv_folder,path_field_info,name):
         players=[]
+        path_csv_folder=path_csv_folder+name
+        path_field_info=path_field_info+name+'/fieldmatch.txt'
         path_csv_folder=self.check_slash(path_csv_folder)
         files_csv = glob.glob(path_csv_folder + '*.csv')
         files_csv.__delitem__(-1)
@@ -354,12 +371,6 @@ class Write_log:
 
         file_to_write.close()
 
-if __name__ == "__main__":
-
-    csv_path = 'data/3. data_csv_second_average/'
-    field = 'data/2. data_csv_format/'
-    name_of_dir='전북'
-
     Write_log()
     writeObject = Write_log()
-    writeObject.detect_playing(csv_path+name_of_dir,field+name_of_dir+'/fieldmatch.txt')
+    writeObject.detect_playing(csv_path,field,name_of_dir)
