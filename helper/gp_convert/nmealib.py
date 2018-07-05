@@ -80,17 +80,24 @@ class NmeaRmcMessage(NmeaMessage):
         self.altitude = -1
         self.speedKnot = -1
         self.activeOrVoid = '' # active=A, void=V
-        self.__setData()
+        self.check_stable = self.__setData()
 
     def __setData(self):
-        self.utcTimeStamp = self._tokens[1]
-        self.activeOrVoid = self._tokens[2]
-        self.latitudeDms = self._tokens[3]
-        self.northOrSouth = self._tokens[4]
-        self.longitudeDms = self._tokens[5]
-        self.eastOrWest = self._tokens[6]
-        self.speedKnot = self._tokens[7]
-        self.utcDateStamp = self._tokens[9]
+        try:
+            self.utcTimeStamp = self._tokens[1]
+            self.activeOrVoid = self._tokens[2]
+            self.latitudeDms = self._tokens[3]
+            self.northOrSouth = self._tokens[4]
+            self.longitudeDms = self._tokens[5]
+            self.eastOrWest = self._tokens[6]
+            self.speedKnot = self._tokens[7]
+            self.utcDateStamp = self._tokens[9]
+        except:
+            return False
+        return True
+
+    def isStable(self):
+        return self.check_stable
 
     def isValid(self):
         return super(NmeaRmcMessage, self).isValid and self._messageType == NmeaUtils.MessageType.RMC and self.activeOrVoid == 'A'
