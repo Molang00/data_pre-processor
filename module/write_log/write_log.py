@@ -85,6 +85,21 @@ class Write_log:
             statu=True
         return statu
 
+    def sort_sub(self,p):
+        for i in range(len(p)-1):
+            for j in range(len(p)-1):
+                if p[j][1]*60 + p[j][2]>p[j+1][1]*60 + p[j+1][2]:
+                    temp=p[j+1]
+                    p[j+1]=p[j]
+                    p[j]=temp
+        i=0
+        while i<len(p)-1:
+            if p[i][0]==p[i+1][0]:
+                p.remove(p[i])
+            i=i+1
+
+        return p
+
     def detect_playing(self,path_csv_folder,path_field_info):
         players=[]
         path_csv_folder=self.check_slash(path_csv_folder)
@@ -244,107 +259,97 @@ class Write_log:
 
             i=i+1
         #교체선수 찾아보기 여기알고리즘부족함
-        list_sub=[]
-        sub=[]
-        for player in players:
+        pout_fh=[]
+        pin_fh=[]
+        pout_sh=[]
+        pin_sh=[]
+        pout_h=[]
+        pin_h=[]
+        for p in players:
             i=0
-            playing_num = 0
-            playing_num1 = 0
-            break_num = 0
-            while(i<len(player)):
+            while(i<len(p)-10):
+                #이반복문안에서check_substitution돌려야지 밑에 반복문에서 판별에서 사용가능함
+                stamp_true_fh=0
+                stamp_false_fh=0
+                stamp_true_sh=0
+                stamp_false_sh=0
+                j=i-10
+                while j<i:
+                    if p[j][3]==True:
+                        stamp_true_fh=stamp_true_fh+1
+                    elif p[j][3]==False:
+                        stamp_false_fh=stamp_false_fh+1
+                    j=j+1
+                while j<i+10:
+                    if p[j][3]==True:
+                        stamp_true_sh=stamp_true_sh+1
+                    elif p[j][3]==False:
+                        stamp_false_sh=stamp_false_sh+1
+                    j=j+1
 
-                if (player[i][1]>start1_hour or (player[i][1]==start1_hour and player[i][2]>start1_minute)) and(player[i][1]<end1_hour or (player[i][1]==end1_hour and player[i][2]<end1_minute)): #전반전 내의 시간대만 체크
-                    if player[i][3]==True:
-                        playing_num=playing_num+1
-                    elif player[i][3]==False:
-                        break_num=break_num+1
+                out_ap=stamp_true_fh-stamp_false_fh
+                out_dui=stamp_false_sh-stamp_true_sh
+                in_ap=stamp_false_fh-stamp_true_fh
+                in_dui=stamp_true_sh-stamp_false_sh
+                # 연속으로 false나오는게 더 많은애들이 더 정확하다는 알고리즘설치
 
 
-                if (player[i][1]>end1_hour or (player[i][1]==end1_hour and player[i][2]>end1_minute)) and(player[i][1]<start2_hour or (player[i][1]==start2_hour and player[i][2]<start2_minute)): # 휴식시간 체크
-                    playing_num = playing_num
-                    break_num = break_num
-
-                if (player[i][1]>start2_hour or (player[i][1]==start2_hour and player[i][2]>start2_minute)) and(player[i][1]<end2_hour or (player[i][1]==end2_hour and player[i][2]<end2_minute)): #후반전 내의 시간대만 체크
-                    if player[i][3]==True:
-                        playing_num1=playing_num1+1
-                    elif player[i][3] == False:
-                        break_num = break_num + 1
-
+                #경기 안 뛴 애들거 걸러주기
+                #경기안뛴애들거를때 아무래도 false갯수를 써야할것같다 false 갯수카운트
+                #그리고 인 아웃 두개씩잡는것도 걸러줘야한다.(근데 둘중에 머가 더 정확한지는 모름 아마 연속성판단해야할듯)
+                if (p[i][1]> start1_hour or (p[i][1]==start1_hour and p[i][2]>start1_minute)) and (p[i][1]<end1_hour or (p[i][1]==end1_hour and p[i][2]<end1_minute)) : #전반전동안에
+                    if p[i+8][1]>end1_hour or (p[i+8][1]==end1_hour and p[i+8][2]>end1_minute): #전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        i=i+1
+                        continue
+                    if p[i-1][3] == True and p[i][3] == False and out_ap>3 and out_dui>3: #전반전 교체out찾기
+                        pout_fh.append([p[i][0].replace('.csv',''),p[i][1],p[i][2]])
+                    if p[i-1][3] == False and p[i][3] == True and in_ap>3 and in_dui>3:  # 전반전 교체in찾기
+                        pin_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
+                if (p[i][1] > end1_hour or (p[i][1] == end1_hour and p[i][2] > end1_minute)) and (p[i][1] < start2_hour or (p[i][1] == start2_hour and p[i][2] < start2_minute)):  # 하프타임동안에
+                    if p[i+8][1]>end1_hour or (p[i+8][1]==end1_hour and p[i+8][2]>end1_minute): #전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        i=i+1
+                        continue
+                    if p[i-8][1]<start2_hour or (p[i-8][1]==start2_hour and p[i-8][2]<start2_minute): #후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        i=i+1
+                        continue
+                    if p[i-1][3] == True and p[i][3] == False and out_ap>3 and out_dui>3:  # 하프타임 교체out찾기
+                        pout_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
+                    if p[i-1][3] == False and p[i][3] == True and in_ap>3 and in_dui>3:  # 하프타임 교체in찾기
+                        pin_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
+                if (p[i][1] > start2_hour or (p[i][1] == start2_hour and p[i][2] > start2_minute)) and (p[i][1] < end2_hour or (p[i][1] == end2_hour and p[i][2] < end2_minute)):  # 후반전동안에
+                    if p[i-8][1]<start2_hour or (p[i-8][1]==start2_hour and p[i-8][2]<start2_minute): #후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        i=i+1
+                        continue
+                    if p[i-1][3] == True and p[i][3] == False and out_ap>3 and out_dui>3:  # 후반전 교체out찾기
+                        pout_sh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
+                    if p[i-1][3] == False and p[i][3] == True and in_ap>3 and in_dui>3:  # 후반전 교체in찾기
+                        pin_sh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                 i=i+1
-            sub.append([player[0][0], playing_num, break_num,playing_num1])
-        #선수들의 활동 시간 체크
-        revise=[]
-        fh=[]
-        sh=[]
-        i = 0
-        while i<len(sub):
-            revise.append(sub[i][2])
-            fh.append(sub[i][1])
-            sh.append(sub[i][3])
-            i=i+1
-        cnt=Counter(revise)
-        real_break=cnt.most_common(1)[0][0]
-        fhtime=max(fh)
-        shtime=max(sh)
-
-        pout=[]
-        pin=[]
-        for s in sub:
-            print(s)
-            if s[2]>90:
-                continue
-            if (s[1]<5 and s[3]<5 and s[2]>80):
-                continue
-            #후반전에 교체in
-            if s[1]<fhtime and s[2]>=shtime-real_break-5: #전반전시간보다 적게 뛰고 휴식이 후반전보다 많으면
-                time=shtime-s[3]
-                hh=end2_hour
-                if end2_minute-time<0:
-                    time=60-(time-end2_minute)
-                    hh=end2_hour-1
-                else:
-                    time=end2_minute-time
-                pin.append([s[0],hh,time])
-            #후반전에 교체out
-            if s[1]>=fhtime-real_break and s[3]<shtime and s[2]>real_break+3: #전반전을 다 소화하고서 후반전을 다 뛰지 않고 나간 선수
-                time=shtime-s[3]
-                hh=end2_hour
-                if end2_minute-time<0:
-                    time=60-(time-end2_minute)
-                    hh=end2_hour-1
-                else:
-                    time=end2_minute-time
-                pout.append([s[0],hh,time])
-
-        for i in range(len(pout) - 1):
-            for j in range(len(pout) - 1):
-                if pout[j][1]*60+ pout[j][2]> pout[j + 1][1]*60+pout[j+1][2]:
-                    temp = pout[j + 1]
-                    pout[j + 1] = pout[j]
-                    pout[j] = temp
-
-        for i in range(len(pout) - 1):
-            for j in range(len(pout) - 1):
-                if pin[j][1]*60+ pin[j][2]< pin[j + 1][1]*60+pin[j+1][2]:
-                    temp = pin[j + 1]
-                    pin[j + 1] = pin[j]
-                    pin[j] = temp
+        pout_fh = self.sort_sub(pout_fh)
+        pin_fh = self.sort_sub(pin_fh)
+        pout_h = self.sort_sub(pout_h)
+        pin_h = self.sort_sub(pin_h)
+        pout_sh = self.sort_sub(pout_sh)
+        pin_sh = self.sort_sub(pin_sh)
 
         #log.csv생성하는부분임
         file_to_write=open(path_csv_folder+'log.csv','w')
         file_to_write.write(write_order+'\n')
-
         file_to_write.write('START1,' + str(start1_hour) + ':' + str(start1_minute) + ':00' + '\n')
-        # 교체
-        file_to_write.write('END1,' + str(end1_hour) + ':' + str(end1_minute) + ':00' + '\n')
-        # 교체
-        file_to_write.write('START2,' + str(start2_hour) + ':' + str(start2_minute) + ':00' + '\n')
         i=0
-        while(i<len(pout)):
-            name=pout[i][0].replace('.csv','')
-            name1=pin[i][0].replace('.csv','')
-            file_to_write.write('SUB,' +str(pout[i][1])+ ':'+str(pout[i][2]-2) + ':00,'+name+','+name1 + '\n')
+        while i<len(pout_fh):
+            file_to_write.write('SUB,'+str(pout_fh[i][1])+':'+str(pout_fh[i][2])+':00,'+pout_fh[i][0]+','+pin_fh[i][0]+'\n')
             i=i+1
+        file_to_write.write('END1,' + str(end1_hour) + ':' + str(end1_minute) + ':00' + '\n')
+        i = 0
+        while i<len(pout_h):
+            file_to_write.write('SUB,'+str(pout_h[i][1])+':'+str(pout_h[i][2])+':00,'+pout_h[i][0]+','+pin_h[i][0]+'\n')
+            i = i + 1
+        file_to_write.write('START2,' + str(start2_hour) + ':' + str(start2_minute) + ':00' + '\n')
+        i = 0
+        while i<len(pout_sh):
+            file_to_write.write('SUB,'+str(pout_sh[i][1])+':'+str(pout_sh[i][2])+':00,'+pout_sh[i][0]+','+pin_sh[i][0]+'\n')
+            i = i + 1
         file_to_write.write('END2,' + str(end2_hour) + ':' + str(end2_minute) + ':00' + '\n')
 
         file_to_write.close()
