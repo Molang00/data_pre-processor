@@ -104,4 +104,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-module/editdata/edit_data_module.py
