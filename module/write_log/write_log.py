@@ -90,7 +90,7 @@ class Write_log:
             pointC = (lonC, latC)
             pointD = (lonD, latD)
 
-            pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.2)
+            pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
 
             if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
                 infield = True
@@ -209,13 +209,9 @@ class Write_log:
             while (i < len(player)):
                 j = 0
                 while (player[i][1] != time_table[j][0] or player[i][2] != time_table[j][1]):
-                    if time_table[j][0] < player[i][1] or (
-                            time_table[j][0] == player[i][1] and time_table[j][1] < player[i][
-                        2]):  # time table의 시간보다 더 큰 시간이 잡힌 경우
+                    if time_table[j][0] < player[i][1] or (time_table[j][0] == player[i][1] and time_table[j][1] < player[i][2]):  # time table의 시간보다 더 큰 시간이 잡힌 경우
                         j = j + 1
-                    elif time_table[j][0] > player[i][1] or (
-                            time_table[j][0] == player[i][1] and time_table[j][1] > player[i][
-                        2]):  # time table의 시간이 더 큰 시간이 잡힌 경우
+                    elif time_table[j][0] > player[i][1] or (time_table[j][0] == player[i][1] and time_table[j][1] > player[i][2]):  # time table의 시간이 더 큰 시간이 잡힌 경우
                         i = i + 1
 
                 if player[i][3] == True:
@@ -234,19 +230,20 @@ class Write_log:
         l = 0
         p = 0
         q = 0
+
         timestp_fh = 0
         timestp_break = 0
         timestp_sh = 0
         start1_hour = -1
         start1_minute = -1
-        start2_hour = 1
+        start2_hour = -1
         start2_minute = -1
         end1_hour = -1
         end1_minute = -1
         end2_hour = -1
         end2_minute = -1
         #start 타이밍이랑 end타이밍 정할때도 이거 좀 똑바로해야함 start를잡아야함
-        print(time_table)
+
         while (i < len(time_table)-2):  # start,end정하는 알고리즘
             num_playing_1 = time_table[i][2]
             if i < len(time_table) - 1:
@@ -283,6 +280,7 @@ class Write_log:
 
             i = i + 1
         # 교체선수 찾아보기 여기알고리즘부족함
+
         pout_fh = []
         pin_fh = []
         pout_sh = []
@@ -292,11 +290,11 @@ class Write_log:
         for p in players:
             i = 0
             while (i < len(p) - 10):
-                # 이반복문안에서check_substitution돌려야지 밑에 반복문에서 판별에서 사용가능함
                 stamp_true_fh = 0
                 stamp_false_fh = 0
                 stamp_true_sh = 0
                 stamp_false_sh = 0
+                #경기안뛰는애들잡아내자
                 j = i - 10
                 while j < i:
                     if p[j][3] == True:
@@ -314,34 +312,27 @@ class Write_log:
                 out_dui = stamp_false_sh - stamp_true_sh
                 in_ap = stamp_false_fh - stamp_true_fh
                 in_dui = stamp_true_sh - stamp_false_sh
-                if (p[i][1] > start1_hour or (p[i][1] == start1_hour and p[i][2] > start1_minute)) and (
-                        p[i][1] < end1_hour or (p[i][1] == end1_hour and p[i][2] < end1_minute)):  # 전반전동안에
-                    if p[i + 8][1] > end1_hour or (
-                            p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                if (p[i][1] > start1_hour or (p[i][1] == start1_hour and p[i][2] > start1_minute)) and (p[i][1] < end1_hour or (p[i][1] == end1_hour and p[i][2] < end1_minute)):  # 전반전동안에
+                    if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     if p[i - 1][3] == True and p[i][3] == False and out_ap > 3 and out_dui > 3:  # 전반전 교체out찾기
                         pout_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 전반전 교체in찾기
                         pin_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
-                if (p[i][1] > end1_hour or (p[i][1] == end1_hour and p[i][2] > end1_minute)) and (
-                        p[i][1] < start2_hour or (p[i][1] == start2_hour and p[i][2] < start2_minute)):  # 하프타임동안에
-                    if p[i + 8][1] > end1_hour or (
-                            p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                if (p[i][1] > end1_hour or (p[i][1] == end1_hour and p[i][2] > end1_minute)) and (p[i][1] < start2_hour or (p[i][1] == start2_hour and p[i][2] < start2_minute)):  # 하프타임동안에
+                    if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
-                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][
-                        2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     if p[i - 1][3] == True and p[i][3] == False and out_ap > 3 and out_dui > 3:  # 하프타임 교체out찾기
                         pout_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 하프타임 교체in찾기
                         pin_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
-                if (p[i][1] > start2_hour or (p[i][1] == start2_hour and p[i][2] > start2_minute)) and (
-                        p[i][1] < end2_hour or (p[i][1] == end2_hour and p[i][2] < end2_minute)):  # 후반전동안에
-                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][
-                        2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                if (p[i][1] > start2_hour or (p[i][1] == start2_hour and p[i][2] > start2_minute)) and (p[i][1] < end2_hour or (p[i][1] == end2_hour and p[i][2] < end2_minute)):  # 후반전동안에
+                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     if p[i - 1][3] == True and p[i][3] == False and out_ap > 3 and out_dui > 3:  # 후반전 교체out찾기
@@ -367,25 +358,25 @@ class Write_log:
             print('Error: Creating directory.' + path_to_save)
         file_to_write = open(path_to_save + 'log.csv', 'w')
         file_to_write.write(write_order + '\n')
-        file_to_write.write('START1,' + str(start1_hour) + ':' + str(start1_minute) + ':00' + '\n')
+        file_to_write.write('START1,' + str(start1_hour).zfill(2) + ':' + str(start1_minute).zfill(2) + ':00' + '\n')
         i = 0
         while i < len(pout_fh):
             file_to_write.write(
-                'SUB,' + str(pout_fh[i][1]) + ':' + str(pout_fh[i][2]) + ':00,' + pout_fh[i][0] + ',' + pin_fh[i][0] + '\n')
+                'SUB,' + str(pout_fh[i][1]).zfill(2) + ':' + str(pout_fh[i][2]).zfill(2) + ':00,' + pout_fh[i][0] + ',' + pin_fh[i][0] + '\n')
             i = i + 1
-        file_to_write.write('END1,' + str(end1_hour) + ':' + str(end1_minute) + ':00' + '\n')
+        file_to_write.write('END1,' + str(end1_hour).zfill(2) + ':' + str(end1_minute).zfill(2) + ':00' + '\n')
         i = 0
         while i < len(pout_h):
             file_to_write.write(
-                'SUB,' + str(pout_h[i][1]) + ':' + str(pout_h[i][2]) + ':00,' + pout_h[i][0] + ',' + pin_h[i][0] + '\n')
+                'SUB,' + str(pout_h[i][1]).zfill(2) + ':' + str(pout_h[i][2]).zfill(2) + ':00,' + pout_h[i][0] + ',' + pin_h[i][0] + '\n')
             i = i + 1
-        file_to_write.write('START2,' + str(start2_hour) + ':' + str(start2_minute) + ':00' + '\n')
+        file_to_write.write('START2,' + str(start2_hour).zfill(2) + ':' + str(start2_minute).zfill(2) + ':00' + '\n')
         i = 0
         while i < len(pout_sh):
             file_to_write.write(
-                'SUB,' + str(pout_sh[i][1]) + ':' + str(pout_sh[i][2]) + ':00,' + pout_sh[i][0] + ',' + pin_sh[i][0] + '\n')
+                'SUB,' + str(pout_sh[i][1]).zfill(2) + ':' + str(pout_sh[i][2]).zfill(2) + ':00,' + pout_sh[i][0] + ',' + pin_sh[i][0] + '\n')
             i = i + 1
-        file_to_write.write('END2,' + str(end2_hour) + ':' + str(end2_minute) + ':00' + '\n')
+        file_to_write.write('END2,' + str(end2_hour).zfill(2) + ':' + str(end2_minute).zfill(2) + ':00' + '\n')
 
         file_to_write.close()
 
