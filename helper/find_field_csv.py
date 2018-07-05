@@ -7,6 +7,19 @@ import os
 
 # gps좌표를 meter scale의 distance로 바꾸어준다
 class Find_field_csv:
+    def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate=1):
+
+        def expansion(point, center, rate):
+            x = center[0] + (point[0] - center[0]) * rate
+            y = center[1] + (point[1] - center[1]) * rate
+            return (x, y)
+
+        center = ((pointA[0] + pointB[0] + pointC[0] + pointD[0]) / 4, (pointA[1] + pointB[1] + pointC[1] + pointD[1]) / 4)
+        new_A = expansion(pointA, center, expansion_rate)
+        new_B = expansion(pointB, center, expansion_rate)
+        new_C = expansion(pointC, center, expansion_rate)
+        new_D = expansion(pointD, center, expansion_rate)
+        return new_A, new_B, new_C, new_D
 
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
@@ -90,6 +103,8 @@ class Find_field_csv:
             pointC = (lonC, latC)
             pointD = (lonD, latD)
 
+            pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.2)
+
             if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
                 output = list(df.values[i])  # 필드정보를 찾은 후 그 정보를 output에 담아낸다.
                 break
@@ -116,8 +131,7 @@ class Find_field_csv:
 
     def find_field_csv_folder(self, csv_folder_path, field_info_path, path_to_save):
         outputList = []
-        csv_folder_path = self.check_slash(csv_folder_path)
-        path_to_save = self.check_slash(path_to_save)
+        csv_folder_path=self.check_slash(csv_folder_path)
         files_csv = glob.glob(csv_folder_path + '*.csv')
         # int로 바꿔서 sorting해주는 알고리즘도 해주면 좋을듯
         for file_csv in files_csv:
@@ -138,3 +152,15 @@ class Find_field_csv:
                 'path of data file,file name,field number,field name,pointA(lon,lat),pointB(lon,lat),pointC(lon,lat),pointD(lon,lat)\n')
             lines = "\n".join(e[0] + ", " + str(e[1]) for e in outputList)
             f.writelines(lines)
+
+
+if __name__ == "__main__":
+    # 현재는 data/2.data_csv_format/폴더만 하는데 이것도 선택할 수 있게 인자로 처리할 수 있을 것 같고, 그경우마다 위에 시간체크하는거 달라질수 있을듯
+    csv_dir_path = 'data/2. data_csv_format/'
+    info_path = 'helper/output.csv'
+    path_to_save = 'data/8. data_field_find/'
+    name_of_dir = '수원'
+
+    Find_field_csv()
+    find_field = Find_field_csv()
+    find_field.find_field_csv_folder(csv_dir_path + name_of_dir, info_path, path_to_save + name_of_dir)
