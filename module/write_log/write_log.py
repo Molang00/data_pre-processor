@@ -371,6 +371,12 @@ class Write_log:
 
         file_to_write.close()
 
+if __name__ == "__main__":
+
+    csv_path = 'data/3. data_csv_second_average/'
+    field = 'data/2. data_csv_format/'
+    name_of_dir='전북'
+
     Write_log()
     writeObject = Write_log()
     writeObject.detect_playing(csv_path,field,name_of_dir)
