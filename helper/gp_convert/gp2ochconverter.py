@@ -45,6 +45,8 @@ class GpToOchConverter:
                 nmeaMessage = None
                 if nmeaMessageType == NmeaUtils.MessageType.RMC:
                     nmeaMessage = NmeaRmcMessage(strLine)
+                    if not nmeaMessage.isStable():
+                        continue
 
                 ochElement = self.__parseNmeaMessageToOchMessage(nmeaMessage)
             except ValueError:
