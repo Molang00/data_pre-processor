@@ -2,8 +2,10 @@
 from module.converter.converter_module import Converter
 from module.editdata.edit_data_module import EditData
 from module.extract_data.extract_data_module import Extract_data
-from module.findnoise.findnoise_module import NoiseFinder
+from module.findnoise.find_noise_module import NoiseFinder
 from helper.find_field_csv import Find_field_csv
+from module.write_log.write_log import Write_log
+
 import os
 import sys
 
@@ -129,7 +131,7 @@ class Controller(QMainWindow, form_class):
 
 
 
-    def extract_process(self, path_root_folder_input, path_root_folder_output_for_min_average, path_field_info,path_root_folder_output_for_field, name_folder_list):
+    def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field, name_folder_list):
         '''
         :param path_root_folder_input:
         :param path_root_folder_output:
@@ -138,8 +140,8 @@ class Controller(QMainWindow, form_class):
         '''
         for name_folder in name_folder_list:
             path_csv_folder = os.path.join(path_root_folder_input,name_folder).replace("\\", "/")
-            path_output_folder_for_second_average = os.path.join(path_root_folder_output_for_min_average, name_folder).replace("\\", "/")
-            path_output_folder_for_field = os.path.join(path_root_folder_output_for_field, name_folder).replace("\\", "/")
+            path_output_folder_for_second_average = os.path.join(path_root_folder_for_min_average, name_folder).replace("\\", "/")
+            path_output_folder_for_field = os.path.join(path_root_folder_for_field, name_folder).replace("\\", "/")
 
 
             object_extract = Extract_data()
@@ -173,6 +175,21 @@ class Controller(QMainWindow, form_class):
             object_edit.cut_error(path_root_folder_to_cut, path_root_folder_noise, path_root_folder_for_eddited_files, name_folder)
 
 
+
+    def output_process(self, 
+                       path_root_folder_for_min_average, path_root_folder_for_field, name_folder_list #로그 만드는데 필요한 변수
+                       ):
+        
+        # csv_path = 'data/3. data_csv_second_average/'
+        # field = 'data/8. data_field_find/'
+        # name_of_dir = '전북'
+
+        for name_folder in name_folder_list:
+            Write_log()
+            writeObject = Write_log()
+            writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder)
+
+
     def all_process(self, arg_list):
         print("all process start")
 
@@ -194,7 +211,6 @@ class Controller(QMainWindow, form_class):
         '''
 
         pass
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
