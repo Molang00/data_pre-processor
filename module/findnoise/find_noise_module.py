@@ -221,8 +221,7 @@ class NoiseFinder:
         file_to_read_field.close()
         file_to_write.close()
 
-<<<<<<< HEAD:module/findnoise/findnoise_module.py
-=======
+
         file_to_write_info = open(path_write_folder+'notice_device_info.txt', 'w', encoding="utf-8")
         write_order_info = 'player,state\n'
         file_to_write_info.write(write_order_info)
@@ -239,7 +238,7 @@ class NoiseFinder:
         file_to_write_info.close()
 
 
->>>>>>> find_noise:module/findnoise/find_noise_module.py
+
 start_time = time.time()
 
 if __name__ == "__main__":
