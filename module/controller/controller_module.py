@@ -118,9 +118,9 @@ class Controller(QMainWindow, form_class):
                                                                                 self.process_clicked_list,
                                                                                 is_och =True, is_log = True
                        ))
-        self.button_widget_list[4].clicked.connect(lambda: self.all_process)
+        self.button_widget_list[4].clicked.connect(lambda: self.all_process())
 
-        self.button_widget_list[5].clicked.connect(lambda:self.set_listview(root_gp))
+        self.button_widget_list[5].clicked.connect(lambda: self.set_listview(root_gp))
 
 
     def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, name_folder_list,
@@ -150,7 +150,9 @@ class Controller(QMainWindow, form_class):
 
             if is_min_average:
                 print("Min_average")
+                print(path_csv_folder+"/", path_output_folder_for_second_average+"/")
                 object_extract = Extract_data()
+
                 object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
 
             if is_field:
@@ -197,7 +199,7 @@ class Controller(QMainWindow, form_class):
     def all_process(self):
         print("all process start")
 
-        root_gp = "0. data_gp_format"
+        root_gp = "data/0. data_gp_format"
         root_och = 'data/1. data_och_format/'
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
