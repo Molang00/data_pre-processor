@@ -104,3 +104,4 @@ ENV/
 
 # mypy
 .mypy_cache/
+module/extract_data/extract_data_module.py
