@@ -41,33 +41,41 @@ form_class = uic.loadUiType("module/controller/controller.ui")[0]
 class Controller(QMainWindow, form_class):
 
     process_clicked_list = []
-    need_to_convert_dir = "och"
-
 
     def __init__(self):
         super().__init__()
         self.setupUi(self) #버튼이름을 가져옴
 
-        self.get_ui()
-        
-        self.connect_function_and_widget()
-        self.set_listview('data/1. data_och_format/')
+        self.get_ui()   # 리스트 멤버 변수에 위젯 할당 (관리하기 편하라고)
+
+        self.connect_function_and_widget() #버튼 담당
+        self.set_listview("data/0. data_gp_format") #리스트 뷰 담당
+
 
     #멤버 변수 리스트에 정리해두기
     def get_ui(self):
         self.activity_widget = [self.activity_listview]
-        self.button_widget_list = [self.convert_button, self.extract_button, self.filter_button, self.output_button, self.all_process_button]
+        self.button_widget_list = [self.convert_button, self.extract_button, self.filter_button, self.output_button, self.all_process_button,
+                                   self.refresh_listview_button]
+        self.checkbox_list = [
+            [self.gp_to_och_checkBox, self.och_to_csv_checkBox],
+            [self.min_average_checkBox, self.field_checkBox],
+            [self.find_noise_checkBox, self.edit_data_checkBox],
+            [self.och__checkBox, self.log_checkBox]
+        ]
 
     def set_listview(self, path_activity_folder):
+
         activity_list =  os.listdir(path_activity_folder)
         self.item_model = QStandardItemModel(self.activity_widget[0])
+
         for activity in activity_list:
             item = QStandardItem(activity)
             item.setCheckable(True)
             self.item_model.appendRow(item)
+
         self.activity_widget[0].setModel(self.item_model)
         self.item_model.itemChanged.connect(self.on_listview_item_changed)
-
 
     def on_listview_item_changed(self, item):
 
@@ -81,7 +89,7 @@ class Controller(QMainWindow, form_class):
 
     def connect_function_and_widget(self):
 
-        root_gp =  "0. data_gp_format"
+        root_gp =  "data/0. data_gp_format"
         root_och = 'data/1. data_och_format/'
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
@@ -89,127 +97,140 @@ class Controller(QMainWindow, form_class):
         root_for_field = 'data/8. data_field_find/'
         root_for_noise = 'data/30. data_noise/'
         root_for_result_och = 'data/100. data_result'
-
         path_all_field_info = 'helper/output.csv'
 
-        self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_och, root_csv, self.process_clicked_list))
+        self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och,
+                                                                                 root_csv,
+                                                                                 self.process_clicked_list,
+                                                                                 self.checkbox_list[0][0].isChecked(),self.checkbox_list[0][1].isChecked()
+                                                                                 ))
         self.button_widget_list[1].clicked.connect(lambda : self.extract_process(root_csv, root_summarized, path_all_field_info, root_for_field,
-                                                                        self.process_clicked_list))
+                                                                                self.process_clicked_list,
+                                                                                 self.checkbox_list[1][0].isChecked(),self.checkbox_list[1][1].isChecked()
+                                                                                 ))
         self.button_widget_list[2].clicked.connect(lambda : self.filter_process(root_summarized, root_for_field, root_for_noise,
-                                         root_csv, root_for_editted_file, self.process_clicked_list))
-        self.button_widget_list[3].clicked.connect(lambda : self.convert_process(root_for_editted_file, root_for_result_och, self.process_clicked_list,
-                                          True, True, False))
+                                                                                root_csv, root_for_editted_file,
+                                                                                self.process_clicked_list,
+                                                                                self.checkbox_list[2][0].isChecked(),self.checkbox_list[2][1].isChecked()
+                                                                                ))
+        self.button_widget_list[3].clicked.connect(lambda: self.output_process(root_for_result_och, root_for_editted_file, #och 만드는데 필요한 변수
+                                                                               root_summarized, root_for_field,             #로그 만드는데 필요한 변수
+                                                                                self.process_clicked_list,
+                                                                                is_och =True, is_log = True
+                       ))
+        self.button_widget_list[4].clicked.connect(lambda: self.all_process)
 
-        arg_list = [root_gp, root_och, root_csv, self.process_clicked_list,
-                    root_csv, root_summarized, path_all_field_info, root_for_field,self.process_clicked_list,
-                    root_summarized, root_for_field, root_for_noise,root_csv, root_for_editted_file, self.process_clicked_list,
-                    root_for_editted_file, root_for_result_och, self.process_clicked_list]
-        self.button_widget_list[4].clicked.connect(lambda : self.all_process(arg_list))
+        self.button_widget_list[5].clicked.connect(lambda:self.set_listview(root_gp))
 
-    def convert_process(self, path_root_folder_gp_input, path_root_folder_och_input, path_root_folder_output, name_folder_list, is_gp_to_och=True, is_och_to_csv=True, is_csv_to_och=False):
-        '''
-            :param path_root_folder_input:  string,     'data/2. data_csv_format’,     데이터를 처리할 폴더가 담겨있는 root 경로
-            :param path_root_folder_output: string,     'data/5.data_error_removed’,   결과를 출력할 폴더가 담길 root 경로
-            :param name_folder_list:             list,       ['드래곤즈 0617’,'och'],            처리할 폴더 명
-            :param process_type:            string,     'och_to_csv'    ,               처리 타입 default가 och to csv 변환
-            :return: None
-        '''
+
+    def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, name_folder_list,
+                        is_gp_to_och=True, is_och_to_csv=True):
 
         for name_folder in name_folder_list:
-            object_converter= Converter()
 
             if is_gp_to_och:
-                object_converter.convert_gp_to_och(path_root_folder_gp_input, path_root_folder_output,
-                                                    name_of_dir=name_folder)
+                print("Gp_to_och")
+                object_converter = Converter()
+                object_converter.convert_gp_to_och(path_root_folder_gp, path_root_folder_och,
+                                                   name_of_dir=name_folder)
             if is_och_to_csv:
-                object_converter.convert_och_to_csv(path_root_folder_och_input, path_root_folder_output,
+                print("Och_to_csv")
+                object_converter = Converter()
+                object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
                                                     name_of_dir=name_folder)
-            if is_csv_to_och:
-                object_converter.convert_csv_to_och(path_root_folder_och_input, path_root_folder_output,
-                                                    name_of_dir=name_folder)
 
+    def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field,
+                        name_folder_list,
+                        is_min_average=True, is_field=True):
 
-
-
-    def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field, name_folder_list):
-        '''
-        :param path_root_folder_input:
-        :param path_root_folder_output:
-        :param name_folder_list:
-        :return:
-        '''
         for name_folder in name_folder_list:
             path_csv_folder = os.path.join(path_root_folder_input,name_folder).replace("\\", "/")
             path_output_folder_for_second_average = os.path.join(path_root_folder_for_min_average, name_folder).replace("\\", "/")
             path_output_folder_for_field = os.path.join(path_root_folder_for_field, name_folder).replace("\\", "/")
 
+            if is_min_average:
+                print("Min_average")
+                object_extract = Extract_data()
+                object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
 
-            object_extract = Extract_data()
-            object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
-
-            object_find_field = Find_field_csv()
-            object_find_field.find_field_csv_folder(path_csv_folder+"/", path_field_info, path_output_folder_for_field+"/")
-
-
+            if is_field:
+                print("Field")
+                object_find_field = Find_field_csv()
+                object_find_field.find_field_csv_folder(path_csv_folder+"/", path_field_info, path_output_folder_for_field+"/")
 
     def filter_process(self, path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise,
-                       path_root_folder_to_cut, path_root_folder_for_eddited_files,  name_folder_list):
+                       path_root_folder_to_cut, path_root_folder_for_eddited_files,
+                       name_folder_list,
+                       is_find_noise = True, is_edit_data = True):
 
-        '''
-        :param path_root_folder_summarized_data:
-        :param path_root_folder_output:
-        :param name_folder_list:
-        :return:
-        '''
 
         for name_folder in name_folder_list:
-            print("FIND NOISE")
-            print(path_root_folder_summarized_data + "\n", path_read_field_folder + "\n", path_root_folder_noise + "\n", name_folder)
-            object_noise = NoiseFinder()
-            object_noise.find_noise_in_data(path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise, name_folder)
 
-            print("Edit Data")
-            print(path_root_folder_to_cut + "\n",path_root_folder_noise+'\n' , path_root_folder_for_eddited_files + "\n", name_folder)
+            if is_find_noise:
+                print("FIND NOISE")
+                object_noise = NoiseFinder()
+                object_noise.find_noise_in_data(path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise, name_folder)
 
-            object_edit = EditData()
-            object_edit.cut_error(path_root_folder_to_cut, path_root_folder_noise, path_root_folder_for_eddited_files, name_folder)
+            if is_edit_data:
+                print("Edit Data")
+                object_edit = EditData()
+                object_edit.cut_error(path_root_folder_to_cut, path_root_folder_noise, path_root_folder_for_eddited_files, name_folder)
 
-
-
-    def output_process(self, 
-                       path_root_folder_for_min_average, path_root_folder_for_field, name_folder_list #로그 만드는데 필요한 변수
+    def output_process(self, path_root_folder_processed_och, path_root_folder_processed_csv,     #och 만드는데 필요한 변수
+                       path_root_folder_for_min_average, path_root_folder_for_field,             #로그 만드는데 필요한 변수
+                       name_folder_list,
+                       is_och =True, is_log = True
                        ):
-        
-        # csv_path = 'data/3. data_csv_second_average/'
-        # field = 'data/8. data_field_find/'
-        # name_of_dir = '전북'
 
         for name_folder in name_folder_list:
-            Write_log()
-            writeObject = Write_log()
-            writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder)
+            if is_och:
+                print("OUTPUT_OCH")
+                object_converter = Converter()
+                object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
 
+            if is_log:
+                print("OUTPUT_LOG")
+                Write_log()
+                writeObject = Write_log()
+                writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder) #출력하는 부분 업데이트 할 예정
 
-    def all_process(self, arg_list):
+    def all_process(self):
         print("all process start")
 
-        self.convert_process(arg_list[0], arg_list[1], arg_list[2], self.process_clicked_list)
-        self.extract_process(arg_list[4],arg_list[5],arg_list[6],arg_list[7], self.process_clicked_list)
-        self.filter_process(arg_list[9],arg_list[10],arg_list[11],arg_list[12],arg_list[13], self.process_clicked_list)
-        self.convert_process(arg_list[15],arg_list[16], self.process_clicked_list, False, False, True)
+        root_gp = "0. data_gp_format"
+        root_och = 'data/1. data_och_format/'
+        root_csv = 'data/2. data_csv_format/'
+        root_summarized = 'data/3. data_csv_second_average/'
+        root_for_editted_file = 'data/5. data_csv_cut_error/'
+        root_for_field = 'data/8. data_field_find/'
+        root_for_noise = 'data/30. data_noise/'
+        root_for_result_och = 'data/100. data_result'
+        path_all_field_info = 'helper/output.csv'
+
+        self.convert_process(root_gp, root_och,
+                             root_csv,
+                             self.process_clicked_list,
+                             self.checkbox_list[0][0].isChecked(),
+                             self.checkbox_list[0][1].isChecked()
+                             )
+        self.extract_process(root_csv, root_summarized, path_all_field_info, root_for_field,
+                                         self.process_clicked_list,
+                                         self.checkbox_list[1][0].isChecked(), self.checkbox_list[1][1].isChecked()
+                                         )
+        self.filter_process(root_summarized, root_for_field, root_for_noise,
+                                        root_csv, root_for_editted_file,
+                                        self.process_clicked_list,
+                                        self.checkbox_list[2][0].isChecked(), self.checkbox_list[2][1].isChecked()
+                                        )
+        self.output_process(root_for_result_och, root_for_editted_file,  # och 만드는데 필요한 변수
+                                        root_summarized, root_for_field,  # 로그 만드는데 필요한 변수
+                                        self.process_clicked_list,
+                                        is_och=True, is_log=True
+                                        )
 
         print("all process end")
 
-
     def manage_token(self, path_root_folder_output, name_folder, process_handled, process_type):
-        '''
-        :param path_root_folder_output:
-        :param name_folder:
-        :param process_handled:
-        :param process_type:
-        :return:
-        '''
-
         pass
 
 if __name__ == "__main__":
