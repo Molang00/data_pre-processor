@@ -95,6 +95,7 @@ class Controller(QMainWindow, form_class):
         root_summarized = 'data/3. data_csv_second_average/'
         root_for_editted_file = 'data/5. data_csv_cut_error/'
         root_for_field = 'data/8. data_field_find/'
+        root_for_log = 'data/9. data_log_csv/'
         root_for_noise = 'data/30. data_noise/'
         root_for_result_och = 'data/100. data_result'
         path_all_field_info = 'helper/output.csv'
@@ -113,8 +114,8 @@ class Controller(QMainWindow, form_class):
                                                                                 self.process_clicked_list,
                                                                                 self.checkbox_list[2][0].isChecked(),self.checkbox_list[2][1].isChecked()
                                                                                 ))
-        self.button_widget_list[3].clicked.connect(lambda: self.output_process(root_for_result_och, root_for_editted_file, #och 만드는데 필요한 변수
-                                                                               root_summarized, root_for_field,             #로그 만드는데 필요한 변수
+        self.button_widget_list[3].clicked.connect(lambda: self.output_process(root_for_result_och, root_for_editted_file,     #och 만드는데 필요한 변수
+                                                                               root_summarized, root_for_field, root_for_log,   #로그 만드는데 필요한 변수
                                                                                 self.process_clicked_list,
                                                                                 is_och =True, is_log = True
                        ))
@@ -178,8 +179,8 @@ class Controller(QMainWindow, form_class):
                 object_edit = EditData()
                 object_edit.cut_error(path_root_folder_to_cut, path_root_folder_noise, path_root_folder_for_eddited_files, name_folder)
 
-    def output_process(self, path_root_folder_processed_och, path_root_folder_processed_csv,     #och 만드는데 필요한 변수
-                       path_root_folder_for_min_average, path_root_folder_for_field,             #로그 만드는데 필요한 변수
+    def output_process(self, path_root_folder_processed_och, path_root_folder_processed_csv,                    #och 만드는데 필요한 변수
+                       path_root_folder_for_min_average, path_root_folder_for_field, path_root_folder_for_log,       #로그 만드는데 필요한 변수
                        name_folder_list,
                        is_och =True, is_log = True
                        ):
@@ -194,7 +195,7 @@ class Controller(QMainWindow, form_class):
                 print("OUTPUT_LOG")
                 Write_log()
                 writeObject = Write_log()
-                writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder) #출력하는 부분 업데이트 할 예정
+                writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder, path_root_folder_for_log) #출력하는 부분 업데이트 할 예정
 
     def all_process(self):
         print("all process start")
@@ -205,6 +206,7 @@ class Controller(QMainWindow, form_class):
         root_summarized = 'data/3. data_csv_second_average/'
         root_for_editted_file = 'data/5. data_csv_cut_error/'
         root_for_field = 'data/8. data_field_find/'
+        root_for_log = 'data/9. data_log_csv/'
         root_for_noise = 'data/30. data_noise/'
         root_for_result_och = 'data/100. data_result'
         path_all_field_info = 'helper/output.csv'
@@ -225,10 +227,10 @@ class Controller(QMainWindow, form_class):
                                         self.checkbox_list[2][0].isChecked(), self.checkbox_list[2][1].isChecked()
                                         )
         self.output_process(root_for_result_och, root_for_editted_file,  # och 만드는데 필요한 변수
-                                        root_summarized, root_for_field,  # 로그 만드는데 필요한 변수
-                                        self.process_clicked_list,
-                                        is_och=True, is_log=True
-                                        )
+                            root_summarized, root_for_field, root_for_log,  # 로그 만드는데 필요한 변수
+                            self.process_clicked_list,
+                            is_och=True, is_log=True
+                            )
 
         print("all process end")
 
