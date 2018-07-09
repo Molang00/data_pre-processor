@@ -1,5 +1,9 @@
 # develope
-data/
+*.gp
+*.och
+*.csv
+notice_device_info.txt
+fieldmatch.txt
 settings/
 
 # pycharm
