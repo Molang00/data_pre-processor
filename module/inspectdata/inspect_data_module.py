@@ -4,7 +4,7 @@ import time
 import openpyxl
 
 
-class Find_diff_log:
+class Inspect_data:
     Players = []
 
     def creat_dir(self, directory):
@@ -286,7 +286,7 @@ class Find_diff_log:
         write_order = "ErrorCode,ErrorValue,Detail\n"
         self.write_error(path_write, 'player_difference.txt', write_order, error_list)
 
-    def find_inspection(self, path_read_xl, path_read_log, path_raw_data, path_write, name_of_dir):
+    def do_inspection(self, path_read_xl, path_read_log, path_raw_data, path_write, name_of_dir):
         self.look_up_player(path_read_xl, path_raw_data, path_write, name_of_dir)
         self.find_diff_log(path_read_xl, path_read_log, path_write, name_of_dir)
         self.look_up_files_stable(path_raw_data, path_write, name_of_dir)
@@ -298,5 +298,5 @@ root_raw_data = 'data/2. data_csv_format/'
 root_write = 'data/31. data_inspection/'
 name_of_dir = 'A-04_U18_수원F/'
 
-FindDiffLogObject = Find_diff_log()
-FindDiffLogObject.find_inspection(root_read_xl, root_read_log, root_raw_data, root_write, name_of_dir)
+InspectDataObject = Inspect_data()
+InspectDataObject.do_inspection(root_read_xl, root_read_log, root_raw_data, root_write, name_of_dir)
