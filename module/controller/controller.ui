@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1199</width>
-    <height>632</height>
+    <width>1164</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -286,14 +286,14 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="refresh_listview_button">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>302</x>
       <y>30</y>
-      <width>93</width>
+      <width>211</width>
       <height>28</height>
      </rect>
     </property>
     <property name="text">
-     <string>새로고침</string>
+     <string>파일 가져오기 N 새로고침</string>
     </property>
    </widget>
   </widget>
@@ -302,7 +302,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1199</width>
+     <width>1164</width>
      <height>26</height>
     </rect>
    </property>

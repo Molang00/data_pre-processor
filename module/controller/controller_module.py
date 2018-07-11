@@ -5,6 +5,7 @@ from module.extract_data.extract_data_module import Extract_data
 from module.findnoise.find_noise_module import NoiseFinder
 from helper.find_field_csv import Find_field_csv
 from module.write_log.write_log import Write_log
+from module.fetch_files.fetch_files_module import Fetch_files
 
 import os
 import sys
@@ -18,8 +19,8 @@ import ctypes
 ##############################
 #massage box 띄우는 건 model에 들어갈 예정
 ###############################
-def Mbox(title,text,style):
-    return ctypes.windll.user32.MessageBoxW(0, text,title, style)
+def Mbox(title="알림", text="", style=0):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 #리스트형태의 데이터를 comboBox에 넣을 수 있게 변형
 class UserModel(QStandardItemModel):
@@ -49,7 +50,7 @@ class Controller(QMainWindow, form_class):
         self.get_ui()   # 리스트 멤버 변수에 위젯 할당 (관리하기 편하라고)
 
         self.connect_function_and_widget() #버튼 담당
-        self.set_listview("data/0. data_gp_format") #리스트 뷰 담당
+        self.set_listview("data/0. data_gp_format")  # 리스트 뷰 담당
 
 
     #멤버 변수 리스트에 정리해두기
@@ -100,6 +101,9 @@ class Controller(QMainWindow, form_class):
         root_for_result_och = 'data/100. data_result'
         path_all_field_info = 'helper/output.csv'
 
+        address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")]
+        access_date = 0
+
         self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och,
                                                                                  root_csv,
                                                                                  self.process_clicked_list,
@@ -121,8 +125,7 @@ class Controller(QMainWindow, form_class):
                        ))
         self.button_widget_list[4].clicked.connect(lambda: self.all_process())
 
-        self.button_widget_list[5].clicked.connect(lambda: self.set_listview(root_gp))
-
+        self.button_widget_list[5].clicked.connect(lambda: self.fetch_process(root_gp, address_ftp_list, access_date))
 
     def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, name_folder_list,
                         is_gp_to_och=True, is_och_to_csv=True):
@@ -197,6 +200,17 @@ class Controller(QMainWindow, form_class):
                 writeObject = Write_log()
                 writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder, path_root_folder_for_log) #출력하는 부분 업데이트 할 예정
 
+    def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
+
+        object_fetch_files = Fetch_files()
+        object_fetch_files.download_recent_file(path_destination_folder=path_destination_folder,address_ftp_list=address_ftp_list,access_date=access_date)
+
+        self.set_listview(path_destination_folder)  # 리스트 뷰 담당
+  
+        Mbox("fetch", "다운로드 완료", 0)
+
+
+
     def all_process(self):
         print("all process start")
 
@@ -233,6 +247,8 @@ class Controller(QMainWindow, form_class):
                             )
 
         print("all process end")
+
+        Mbox("All Process", "처리 완료", 0)
 
     def manage_token(self, path_root_folder_output, name_folder, process_handled, process_type):
         pass
