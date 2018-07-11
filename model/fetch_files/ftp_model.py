@@ -97,17 +97,17 @@ class Ftp_model:
 
     def parse_name(self, name):
 
-        teamNameList = ["강원", "경남", "광주", "대구", "대전", "부산", "부천", "상주", "서울", "서울E", "성남", "수원", "수원F", "아산", "안산",
-                        "안양", "울산", "인천", "전남", "전북", "제주", "포항"]
+        team_name_list = ["강원", "경남", "광주", "대구", "대전", "부산", "부천", "상주", "서울", "서울E", "성남", "수원", "수원F", "아산", "안산",
+                          "안양", "울산", "인천", "전남", "전북", "제주", "포항"]
 
         ftp_name_list = ['ê°\x95ì\x9b\x90', 'ê²½ë\x82¨', 'ê´\x91ì£¼', 'ë\x8c\x80êµ¬', 'ë\x8c\x80ì\xa0\x84', 'ë¶\x80ì\x82°', 'ë¶\x80ì²\x9c', 'ì\x83\x81ì£¼', 'ì\x84\x9cì\x9a¸', 'ì\x84\x9cì\x9a¸E', 'ì\x84±ë\x82¨', 'ì\x88\x98ì\x9b\x90', 'ì\x88\x98ì\x9b\x90F', 'ì\x95\x84ì\x82°', 'ì\x95\x88ì\x82°', 'ì\x95\x88ì\x96\x91', 'ì\x9a¸ì\x82°', 'ì\x9d¸ì²\x9c', 'ì\xa0\x84ë\x82¨', 'ì\xa0\x84ë¶\x81', 'ì\xa0\x9cì£¼', 'í\x8f¬í\x95\xad']
 
         tmp_len_name = len(name)
         for i in range(len(ftp_name_list)):
-            name = name.replace(ftp_name_list[i], teamNameList[i])
+            name = name.replace(ftp_name_list[i], team_name_list[i])
 
             if not tmp_len_name == len(name):
-                print("이름 변경", ftp_name_list[i], teamNameList[i])
+                print("이름 변경", ftp_name_list[i], team_name_list[i])
                 break
 
         return  name
