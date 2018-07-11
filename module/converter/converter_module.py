@@ -44,6 +44,9 @@ class Converter:
             # 각 파일 마다 initialize 하여 GpToOchConvert Object를 생성 후 convert 실행
             GpToOchConverterObject = GpToOchConverter()
             GpToOchConverterObject.convertToOchFile(file_gp, file_och)
+            # .och파일에 내용이 없으면 제거
+            if os.path.getsize(file_och) < 1000:
+                os.remove(file_och)
 
     def convert_och_to_csv(self, path_och, path_csv, name_of_dir):
         # path_och 읽을 och파일이 저장된 path를 string으로 저장
@@ -95,7 +98,6 @@ class Converter:
 
                 except IndexError:
                     # .och 파일에 의미없는 정보가 저장된 줄은 pass
-                    print("Exist meaningless information\n")
                     pass
 
             file_to_write.close()
