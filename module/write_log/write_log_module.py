@@ -27,7 +27,7 @@ class Write_log:
         # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
         if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
             # path_string = os.path.join(path_string, '/')
-            path_string=path_string+'/'
+            path_string = path_string + '/'
         return path_string
 
     # gps좌표를 meter scale의 distance로 바꾸어준다
@@ -132,10 +132,10 @@ class Write_log:
 
     def read_csv_files(self, players, files_csv, path_csv_folder, path_field_info):
         # csvfolder에 있는 csvfile들을 읽어들여서 활동 여부를 판단해주는 리스트를 만든다.
-        path_csv_folder=path_csv_folder[:len(path_csv_folder)-1]+'\\'
+        path_csv_folder = path_csv_folder[:len(path_csv_folder) - 1] + '\\'
         for file_csv in files_csv:
             player = []
-            filename = file_csv.replace(path_csv_folder,'')
+            filename = file_csv.replace(path_csv_folder, '')
             file_to_read = open(file_csv, 'r')
             read_values = file_to_read.readlines()
             data = read_values[1].split(',')
@@ -179,19 +179,19 @@ class Write_log:
                     check_time_temp = check_time
                     value_temp = value
                     count = 1
-            players.append(player) #이렇게 읽어드린csv파일들을 player라는 형태의 list로 players에 저장
+            players.append(player)  # 이렇게 읽어드린csv파일들을 player라는 형태의 list로 players에 저장
         return players
 
     def find_time_table(self, time_table, players):
         # 초기화해준다. (left time은 모든 파일들 중 가장 먼저 시작되는 시간이고 right time은 가장 나중에 끝나는 시간임)
-        left_hour, left_min, right_hour, right_min = 24, 60, 1, 1 #left time과 right time변수의 초기화
+        left_hour, left_min, right_hour, right_min = 24, 60, 1, 1  # left time과 right time변수의 초기화
         for player in players:
             if left_hour > player[0][1] or (left_hour == player[0][1] and left_min > player[0][2]):
-                #만약 읽어드린 파일의 가장 첫번째 시간대가 left time보다 이를 경우 lefttime으로 지정
+                # 만약 읽어드린 파일의 가장 첫번째 시간대가 left time보다 이를 경우 lefttime으로 지정
                 left_hour = player[0][1]
                 left_min = player[0][2]
             if right_hour < player[-1][1] or (right_hour == player[-1][1] and right_min < player[-1][2]):
-                #만약 읽어드린 파일의 가장 마지막 시간대가 right time보다 추후일 경우 righttime으로 지정
+                # 만약 읽어드린 파일의 가장 마지막 시간대가 right time보다 추후일 경우 righttime으로 지정
                 right_hour = player[-1][1]
                 right_min = player[-1][2]
         # 최소시간과 최대시간을 찾는다.
@@ -200,22 +200,22 @@ class Write_log:
             time_table.append([left_hour, left_min, 0])
             if left_hour == right_hour and left_min == right_min:
                 break
-            if not left_min == 59:#append할시 분단위가60이 넘어가게 될 경우 시간이 오르게설정
+            if not left_min == 59:  # append할시 분단위가60이 넘어가게 될 경우 시간이 오르게설정
                 left_min = left_min + 1
             else:
                 left_min = 0
                 left_hour = left_hour + 1
-            #23시59분이후 시간을 0 0으로해주는 것을 구현안했으니 만약에 그 문제가 생기면은 여기를 보도록하자.
+            # 23시59분이후 시간을 0 0으로해주는 것을 구현안했으니 만약에 그 문제가 생기면은 여기를 보도록하자.
         return time_table
 
     def check_number_playing_in_time_table(self, time_table, players):
         # time_table의 있는 시간대로 찾아가서 만약 해당 시간대에서 플레이어가 활동중이면 활동중인 횟수를+1해준다.
         for player in players:
             i = 0
-            stamp = 0 #stamp는 활동중인 선수의 수를 세어주는 변수이다.
+            stamp = 0  # stamp는 활동중인 선수의 수를 세어주는 변수이다.
             while (i < len(player)):
                 j = 0
-                #밑의 반복문으로 timetable에 적힌 시간대에서의 player의 원소로 찾아가서 활동성을 체크한다.
+                # 밑의 반복문으로 timetable에 적힌 시간대에서의 player의 원소로 찾아가서 활동성을 체크한다.
                 while (player[i][1] != time_table[j][0] or player[i][2] != time_table[j][1]):
                     if time_table[j][0] < player[i][1] or (
                             time_table[j][0] == player[i][1] and time_table[j][1] < player[i][
@@ -225,7 +225,7 @@ class Write_log:
                             time_table[j][0] == player[i][1] and time_table[j][1] > player[i][
                         2]):  # time table의 시간이 더 큰 시간이 잡힌 경우
                         i = i + 1
-                #선수가 활동중이면은 1을 더해준다.
+                # 선수가 활동중이면은 1을 더해준다.
                 if player[i][3] == True:
                     time_table[j][2] = time_table[j][2] + 1
                 elif player[i][3] == False:
@@ -233,7 +233,7 @@ class Write_log:
                 else:
                     time_table[j][2] = time_table[j][2]
                 stamp = stamp + 1
-                #i를 stamp로 초기화해줌으로 한번 검사한 항은 건너뛰고 반복문을 돌게함으로 시간을 절약해줌
+                # i를 stamp로 초기화해줌으로 한번 검사한 항은 건너뛰고 반복문을 돌게함으로 시간을 절약해줌
                 i = stamp
         return time_table
 
@@ -281,7 +281,7 @@ class Write_log:
             if p == 1:  # 후반시작지점이후부터 1분당 지나는 시간 체크
                 timestp_sh = timestp_sh + 1
             i = i + 1
-        #정해진 시간들을 timelist에 append한 다음에 return해준다.
+        # 정해진 시간들을 timelist에 append한 다음에 return해준다.
         time_list.append(start1_hour)
         time_list.append(start1_minute)
         time_list.append(end1_hour)
@@ -292,7 +292,8 @@ class Write_log:
         time_list.append(end2_minute)
 
         return time_list
-    #교체선수의 교체시간을 찾아낸다.
+
+    # 교체선수의 교체시간을 찾아낸다.
     def find_sub_list(self, players, sub_list, time_list):
         pout_fh = []
         pin_fh = []
@@ -300,17 +301,17 @@ class Write_log:
         pin_sh = []
         pout_h = []
         pin_h = []
-        start1_hour, start1_minute,end1_hour, end1_minute =  time_list[0], time_list[1], time_list[2], time_list[3]
-        start2_hour,start2_minute,end2_hour, end2_minute = time_list[4], time_list[5], time_list[6], time_list[7]
+        start1_hour, start1_minute, end1_hour, end1_minute = time_list[0], time_list[1], time_list[2], time_list[3]
+        start2_hour, start2_minute, end2_hour, end2_minute = time_list[4], time_list[5], time_list[6], time_list[7]
         sub_list[0], sub_list[1], sub_list[2] = pout_fh, pin_fh, pout_h
         sub_list[3], sub_list[4], sub_list[5] = pin_h, pout_sh, pin_sh
-        #sublist들에 담길 필요한 정보들과 리스트 초기화해줌
+        # sublist들에 담길 필요한 정보들과 리스트 초기화해줌
 
         for p in players:
             i = 0
             out_checker = 0
             while (i < len(p) - 10):
-                #해당시간대의 앞뒤의 true false갯수를 세기 위한 변수 초기화
+                # 해당시간대의 앞뒤의 true false갯수를 세기 위한 변수 초기화
                 stamp_true_fh, stamp_false_fh, stamp_true_sh, stamp_false_sh = 0, 0, 0, 0
                 j = i - 10
                 while j < i:
@@ -319,38 +320,44 @@ class Write_log:
                     elif p[j][3] == False:
                         stamp_false_fh = stamp_false_fh + 1
                     j = j + 1
-                    #_fh가 붙은 애들이 해당시간 앞의 트루 폴스 갯수를 센다.
+                    # _fh가 붙은 애들이 해당시간 앞의 트루 폴스 갯수를 센다.
                 while j < i + 10:
                     if p[j][3] == True:
                         stamp_true_sh = stamp_true_sh + 1
                     elif p[j][3] == False:
                         stamp_false_sh = stamp_false_sh + 1
                     j = j + 1
-                    #_sh가 붙은 애들이 해당시간 뒤의 트로 폴스 갯수를 센다.
+                    # _sh가 붙은 애들이 해당시간 뒤의 트로 폴스 갯수를 센다.
 
-                out_ap = stamp_true_fh - stamp_false_fh #해당시간 앞 10개에 대한 true-false
-                out_dui = stamp_false_sh - stamp_true_sh #해당시간 뒤 10개에 대한 false-true
-                in_ap = stamp_false_fh - stamp_true_fh#해당시간 앞 10개에 대한 false-true
-                in_dui = stamp_true_sh - stamp_false_sh#해당시간 뒤 10개에 대한 true-false
+                out_ap = stamp_true_fh - stamp_false_fh  # 해당시간 앞 10개에 대한 true-false
+                out_dui = stamp_false_sh - stamp_true_sh  # 해당시간 뒤 10개에 대한 false-true
+                in_ap = stamp_false_fh - stamp_true_fh  # 해당시간 앞 10개에 대한 false-true
+                in_dui = stamp_true_sh - stamp_false_sh  # 해당시간 뒤 10개에 대한 true-false
 
                 if i == len(p) - 11:  # 반복문마지막에 다다랐을때 후반종료가 아니면 교체out으로 잡아주어야 한다.
                     if p[i + 10][1] < end2_hour or (
                             p[i + 10][1] == end2_hour and p[i + 10][2] < end2_minute):  # 끝나는 시간보다 더 일찍 기계가 꺼진경우(교체된경우)
                         out_checker = 1
 
-                if (p[i][1] > start1_hour or (p[i][1] == start1_hour and p[i][2] > start1_minute)) and (p[i][1] < end1_hour or (p[i][1] == end1_hour and p[i][2] < end1_minute)):  # 전반전동안에
-                    if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute) and out_checker == 0:  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                if (p[i][1] > start1_hour or (p[i][1] == start1_hour and p[i][2] > start1_minute)) and (
+                        p[i][1] < end1_hour or (p[i][1] == end1_hour and p[i][2] < end1_minute)):  # 전반전동안에
+                    if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][
+                        2] > end1_minute) and out_checker == 0:  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
-                    if (p[i - 1][3] == True and p[i][3] == False and out_ap > 3 and out_dui > 3) or out_checker == 1:  # 전반전 교체out찾기
+                    if (p[i - 1][3] == True and p[i][
+                        3] == False and out_ap > 3 and out_dui > 3) or out_checker == 1:  # 전반전 교체out찾기
                         pout_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 전반전 교체in찾기
                         pin_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
-                if ((p[i][1] > end1_hour or (p[i][1] == end1_hour and p[i][2] > end1_minute)) and (p[i][1] < start2_hour or (p[i][1] == start2_hour and p[i][2] < start2_minute))):  # 하프타임동안에
-                    if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                if ((p[i][1] > end1_hour or (p[i][1] == end1_hour and p[i][2] > end1_minute)) and (
+                        p[i][1] < start2_hour or (p[i][1] == start2_hour and p[i][2] < start2_minute))):  # 하프타임동안에
+                    if p[i + 8][1] > end1_hour or (
+                            p[i + 8][1] == end1_hour and p[i + 8][2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
-                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][2] < start2_minute) and out_checker == 0:  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                    if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][
+                        2] < start2_minute) and out_checker == 0:  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     # 하프타임교체잡는 알고리즘 다시 생각해보자->전반에뛰다가 후반에는 안뛰는 그런걸로 찾아줘야 할 것 같다.
@@ -378,14 +385,15 @@ class Write_log:
         pin_h = self.sort_sub(pin_h)
         pout_sh = self.sort_sub(pout_sh)
         pin_sh = self.sort_sub(pin_sh)
-        print(pout_fh)
+
         if (len(pout_sh) + len(pout_fh) + len(pout_h)) != (len(pin_fh) + len(pin_h) + len(pin_sh)):
             pout_fh, pin_fh = self.check_none_sub(pout_fh, pin_fh)
             pout_h, pin_h = self.check_none_sub(pout_h, pin_h)
             pout_sh, pin_sh = self.check_none_sub(pout_sh, pin_sh)
 
         return sub_list
-    #교체선수의 시간정보와 등번호 정보를 담은 리스트들을 인자로 전달받음
+
+    # 교체선수의 시간정보와 등번호 정보를 담은 리스트들을 인자로 전달받음
     def check_none_sub(self, pout, pin):
 
         if len(pout) > len(pin):  # 교체 나가는 선수가 더 많이 잡혔을경우
@@ -418,7 +426,8 @@ class Write_log:
                             pout = self.sort_sub(pout)
                 i = i + 1
         return pout, pin
-    #log를 써주는 함수
+
+    # log를 써주는 함수
     def write_log_file(self, sub_list, path_to_save, time_list):
         write_order = '//event,time,player_out,player_in'
         start1_hour, start1_minute, end1_hour, end1_minute = time_list[0], time_list[1], time_list[2], time_list[3]
@@ -459,41 +468,65 @@ class Write_log:
         file_to_write.write('END2,' + str(end2_hour).zfill(2) + ':' + str(end2_minute).zfill(2) + ':00' + '\n')
 
         file_to_write.close()
-    #모든 메소드들을 콜해주는 함수
-    def detect_playing(self, path_csv_folder, path_field_info, name, path_to_save):
+
+    # 모든 메소드들을 콜해주는 함수
+    def write_playing(self,players,path):
+        # 디렉토리가 없으면은 생성해준다.
+        try:
+            if not os.path.exists(path):
+                os.makedirs(path)
+        except OSError:
+            print('Error: Creating directory.' + path)
+
+        for p in players:
+            i=0
+            filename=p[i][0][:len(p[i][0])-4]+'.txt'
+            pwrite=open(path+filename,'w')
+            while i<len(p):
+                pwrite.write(str(p[i][1])+','+str(p[i][2])+','+str(p[i][3])+'\n')
+                i=i+1
+    # 애들상태뽑아내는 파일임
+
+    def detect_playing(self, path_csv_folder, path_field_info, name, path_to_save,path_statu_player):
         players = []
         time_table = []
         time_list = []
         sub_list = []
-        p=[]
-        i=0
-        while i<6:
+        p = []
+        i = 0
+        while i < 6:
             sub_list.append(p)
-            i=i+1
-        #필요한 리스트들을 선언하고 초기화해준다.
+            i = i + 1
+        # 필요한 리스트들을 선언하고 초기화해준다.
         # 파일과 폴더 경로이름을 지정해주는 부분
-        path_csv_folder = path_csv_folder+name
-        path_field_info = path_field_info+name+ '/fieldmatch.txt'
+        path_csv_folder = path_csv_folder + name
+        path_field_info = path_field_info + name + '/fieldmatch.txt'
         path_csv_folder = self.check_slash(path_csv_folder)
         files_csv = glob.glob(path_csv_folder + '*.csv')
         path_to_save = path_to_save + name
         path_to_save = self.check_slash(path_to_save)
+        path_statu_player=path_statu_player+name
+        path_statu_player=self.check_slash(path_statu_player)
         for f in files_csv:
             f = f.replace('\\', '/')
 
         players = self.read_csv_files(players, files_csv, path_csv_folder, path_field_info)
         time_table = self.find_time_table(time_table, players)
         time_table = self.check_number_playing_in_time_table(time_table, players)
+        self.write_playing(players,path_statu_player)
         time_list = self.detect_start_end_time(time_table, time_list)
         sub_list = self.find_sub_list(players, sub_list, time_list)
         self.write_log_file(sub_list, path_to_save, time_list)
+
 
 if __name__ == "__main__":
     csv_path = 'data/3. data_csv_second_average/'
     field = 'data/8. data_field_find/'
     path_to_save = 'data/9. data_log_csv/'
+    path_statu_player= 'data/40. data_statu_player/'
+
     name_of_dir = '드래곤즈'
 
     Write_log()
     writeObject = Write_log()
-    writeObject.detect_playing(csv_path, field, name_of_dir, path_to_save)
+    writeObject.detect_playing(csv_path, field, name_of_dir, path_to_save,path_statu_player)
