@@ -41,22 +41,6 @@ class Find_field_csv:
         d = R * c
         return d * 1000
 
-    def checkPointInRectangle2(self, pointP, pointA, pointB, pointD):
-
-        vectorAB = np.array(np.subtract(pointB, pointA))
-        vectorAD = np.array(np.subtract(pointD, pointA))
-        vectorAP = np.array(np.subtract(pointP, pointA))
-
-        ABsquare = np.dot(vectorAB, vectorAB)
-        ADsquare = np.dot(vectorAD, vectorAD)
-        ABmulAP = np.dot(vectorAB, vectorAP)
-        ADmulAP = np.dot(vectorAD, vectorAP)
-
-        if (0 < ABmulAP and ABmulAP < ABsquare and 0 < ADmulAP and ADmulAP < ADsquare):
-            return True
-        else:
-            return False
-
     def checkPointInRectangle(self, pointP, pointA, pointB, pointC, pointD):
         b1 = False
         b2 = False
