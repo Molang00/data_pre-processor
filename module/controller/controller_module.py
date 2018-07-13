@@ -4,7 +4,7 @@ from module.editdata.edit_data_module import EditData
 from module.extract_data.extract_data_module import Extract_data
 from module.findnoise.find_noise_module import NoiseFinder
 from helper.find_field_csv import Find_field_csv
-from module.write_log.write_log import Write_log
+from module.write_log.write_log_module import Write_log
 from module.fetch_files.fetch_files_module import Fetch_files
 from module.inspectdata.inspect_data_module import Inspect_data
 
