@@ -324,3 +324,21 @@ class Inspect_data:
         self.look_up_player(path_read_xl, path_raw_data, path_write, name_of_dir)
         self.find_diff_log(path_read_xl, path_read_log, path_write, name_of_dir)
         self.look_up_files_stable(path_raw_data, path_write, name_of_dir)
+
+
+if __name__ == "__main__":
+
+    start_time = time.time()
+
+    root_read_xl = 'data/9. data_log_xl/'
+    root_read_log = 'data/0. data_gp_format/'
+    root_raw_data = 'data/2. data_csv_format/'
+    root_write = 'data/31. data_inspection/'
+    name_of_dir = 'A-04_U18_수원F/'
+
+    InspectDataObject = Inspect_data()
+    InspectDataObject.do_inspection(root_read_xl, root_read_log, root_raw_data, root_write, name_of_dir)
+
+    end_time = time.time()-start_time
+    print('noise_finder : '+str(format(end_time, '.6f'))+'sec\n')
+
