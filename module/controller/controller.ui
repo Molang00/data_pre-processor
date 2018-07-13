@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1164</width>
+    <width>1261</width>
     <height>640</height>
    </rect>
   </property>
@@ -233,8 +233,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>730</x>
-      <y>40</y>
+      <x>870</x>
+      <y>30</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -246,8 +246,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>730</x>
-      <y>340</y>
+      <x>870</x>
+      <y>330</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -259,8 +259,8 @@
    <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>70</y>
+      <x>860</x>
+      <y>60</y>
       <width>361</width>
       <height>241</height>
      </rect>
@@ -276,8 +276,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QTextEdit" name="textEdit_2">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>370</y>
+      <x>860</x>
+      <y>360</y>
       <width>361</width>
       <height>181</height>
      </rect>
@@ -296,13 +296,26 @@ p, li { white-space: pre-wrap; }
      <string>파일 가져오기 N 새로고침</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="inspect_button">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>370</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Inspect</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1164</width>
+     <width>1261</width>
      <height>26</height>
     </rect>
    </property>
