@@ -6,6 +6,7 @@ from module.findnoise.find_noise_module import NoiseFinder
 from helper.find_field_csv import Find_field_csv
 from module.write_log.write_log import Write_log
 from module.fetch_files.fetch_files_module import Fetch_files
+from module.inspectdata.inspect_data_module import Inspect_data
 
 import os
 import sys
@@ -56,8 +57,8 @@ class Controller(QMainWindow, form_class):
     #멤버 변수 리스트에 정리해두기
     def get_ui(self):
         self.activity_widget = [self.activity_listview]
-        self.button_widget_list = [self.convert_button, self.extract_button, self.filter_button, self.output_button, self.all_process_button,
-                                   self.refresh_listview_button]
+        self.button_widget_list = [self.convert_button, self.extract_button, self.filter_button, self.output_button, self.inspect_button,
+                                   self.all_process_button, self.refresh_listview_button]
         self.checkbox_list = [
             [self.gp_to_och_checkBox, self.och_to_csv_checkBox],
             [self.min_average_checkBox, self.field_checkBox],
@@ -95,9 +96,11 @@ class Controller(QMainWindow, form_class):
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
         root_for_editted_file = 'data/5. data_csv_cut_error/'
+        root_for_excel = 'data/7. data_log_excel/'
         root_for_field = 'data/8. data_field_find/'
         root_for_log = 'data/9. data_log_csv/'
         root_for_noise = 'data/30. data_noise/'
+        root_for_inspect = 'data/31. data_inspect/'
         root_for_result_och = 'data/100. data_result'
         path_all_field_info = 'helper/output.csv'
 
@@ -110,7 +113,7 @@ class Controller(QMainWindow, form_class):
                                                                                  self.checkbox_list[0][0].isChecked(),self.checkbox_list[0][1].isChecked()
                                                                                  ))
         self.button_widget_list[1].clicked.connect(lambda : self.extract_process(root_csv, root_summarized, path_all_field_info, root_for_field,
-                                                                                self.process_clicked_list,
+                                                                                 self.process_clicked_list,
                                                                                  self.checkbox_list[1][0].isChecked(),self.checkbox_list[1][1].isChecked()
                                                                                  ))
         self.button_widget_list[2].clicked.connect(lambda : self.filter_process(root_summarized, root_for_field, root_for_noise,
@@ -121,11 +124,14 @@ class Controller(QMainWindow, form_class):
         self.button_widget_list[3].clicked.connect(lambda: self.output_process(root_for_result_och, root_for_editted_file,     #och 만드는데 필요한 변수
                                                                                root_summarized, root_for_field, root_for_log,   #로그 만드는데 필요한 변수
                                                                                 self.process_clicked_list,
-                                                                                is_och =True, is_log = True
-                       ))
-        self.button_widget_list[4].clicked.connect(lambda: self.all_process())
+                                                                               self.checkbox_list[3][0].isChecked(), self.checkbox_list[3][1].isChecked()
+                                                                                ))
+        self.button_widget_list[4].clicked.connect(lambda: self.inspect_process(root_csv, root_for_excel, root_for_log, root_for_inspect,
+                                                                                self.process_clicked_list
+                                                                                ))
+        self.button_widget_list[5].clicked.connect(lambda: self.all_process())
 
-        self.button_widget_list[5].clicked.connect(lambda: self.fetch_process(root_gp, address_ftp_list, access_date))
+        self.button_widget_list[6].clicked.connect(lambda: self.fetch_process(root_gp, address_ftp_list, access_date))
 
     def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, name_folder_list,
                         is_gp_to_och=True, is_och_to_csv=True):
@@ -199,6 +205,15 @@ class Controller(QMainWindow, form_class):
                 Write_log()
                 writeObject = Write_log()
                 writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder, path_root_folder_for_log) #출력하는 부분 업데이트 할 예정
+
+    def inspect_process(self, root_csv, root_for_excel, root_for_log, root_for_inspect,
+                       name_folder_list
+                       ):
+
+        for name_folder in name_folder_list:
+            print("INSPECT_DATA")
+            object_inspect = Inspect_data()
+            object_inspect.do_inspection(root_for_excel, root_for_log, root_csv, root_for_inspect, name_folder)
 
     def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
 

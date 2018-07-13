@@ -2,6 +2,7 @@
 *.gp
 *.och
 *.csv
+*.im
 notice_device_info.txt
 fieldmatch.txt
 settings/
