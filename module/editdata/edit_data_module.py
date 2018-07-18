@@ -59,6 +59,7 @@ class EditData:
                 return 1
             if int(value) < int(comparision_value_larger[index]) and is_large:
                 is_large = 0
+
         return 0
 
     def cut_error(self, path_read_csv_folder, path_read_error_folder, path_write_folder, name_of_dir, ck_field=True, ck_dist=True, ck_speed=True):

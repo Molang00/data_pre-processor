@@ -24,9 +24,10 @@ class Rename_file:
             path_string = path_string+'/'
         return path_string
 
+
     def find_file_name(self, name_string, place, type = 'csv', state = '18'):
-        # name_string 폴더의 이름을 string형태로 저장
-        # place home이라면 H, away라면 A를 저장
+        # name_string 폴더의 이름을 string형태로 저장 ex) 'A-01_U18_서울'
+        # place home이라면 H, away라면 A를 저장     ex)'H' 또는 'A'
 
         # serial 번호와 등번호가 적힌 .csv file의 이름을 찾음
         name_list = name_string.split('-')
