@@ -3,6 +3,8 @@
 *.och
 *.csv
 *.im
+*.xlsx
+*.txt
 notice_device_info.txt
 fieldmatch.txt
 settings/

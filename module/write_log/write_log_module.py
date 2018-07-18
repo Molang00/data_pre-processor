@@ -5,6 +5,14 @@ import os
 
 class Write_log:
 
+    def create_dir(self, directory):
+        # directory dir명이 포함된 path가 string으로 저장
+        try:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+        except OSError:
+            print('Error: Creating directory. ' + directory)
+
     # expand_field함수에서 경기장 보정치만큼 필드크기를 늘려줌
     def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate=1):
 
@@ -78,32 +86,29 @@ class Write_log:
         return insideTriangle
 
     # 필드 정보를 읽어들여서 선수가 필드 안에있는지 바깥에 있는지 check해서 안에있으면 true, 바깥에 있으면 False
-    def check_in_field(self, longitude, latitude, fieldmatch):
-        file_read = open(fieldmatch, 'r', encoding="utf-8")
-        values = file_read.readlines()
-        values[0] = values[1]
-        infield = False
-
-        for i in range(len(values)):
-            data = values[i].split(',')
+    def check_in_field(self, longitude, latitude, data):
+        try:
             data[11] = data[11].replace("]", '0')
             # 경로,파일명,번호,구장이름,위도,경도
             lonA, latA, lonB, latB, lonC, latC, lonD, latD = data[4:]
             lonA, latA, lonB, latB, lonC, latC, lonD, latD = float(lonA), float(latA), float(lonB), float(latB), float(
                 lonC), float(latC), float(lonD), float(latD)
+        except:
+            return False
 
-            pointP = (longitude, latitude)
-            pointA = (lonA, latA)
-            pointB = (lonB, latB)
-            pointC = (lonC, latC)
-            pointD = (lonD, latD)
+        pointP = (longitude, latitude)
+        pointA = (lonA, latA)
+        pointB = (lonB, latB)
+        pointC = (lonC, latC)
+        pointD = (lonD, latD)
 
-            # expandfield로 필드를 찾을 때 보정값을 넣은 후에
-            pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
-            # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
-            if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
-                infield = True
-        return infield
+        # expandfield로 필드를 찾을 때 보정값을 넣은 후에
+        pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
+        if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
+            return True
+        else:
+            return False
 
     # 선수의 속도값을 읽어들여서 3~40사이의 속도를 가지면 활동중이라고 판단함
     def check_activation(self, speed):
@@ -124,17 +129,28 @@ class Write_log:
                     p[j] = temp
         i = 0
         # 그리고 나서 만약 교체 리스트에 같은 등번호의 선수가 존재하면 가장 뒷 시간대만 남기고 삭제(이게 해보니까 가장 정확함.)
-        while i < len(p) - 1:
-            if p[i][0] == p[i + 1][0]:
-                p.remove(p[i])
+        while i < len(p):
+            j = i+1
+            while j < len(p):
+                if p[i][0] == p[j][0]:
+                    p.remove(p[i])
+                    i -= 1
+                    break
+                j = j+1
             i = i + 1
         return p
 
     def read_csv_files(self, players, files_csv, path_csv_folder, path_field_info):
         # csvfolder에 있는 csvfile들을 읽어들여서 활동 여부를 판단해주는 리스트를 만든다.
-        path_csv_folder = path_csv_folder[:len(path_csv_folder) - 1] + '\\'
-        for file_csv in files_csv:
+        path_csv_folder = self.check_slash(path_csv_folder)
+
+        file_read = open(path_field_info, 'r', encoding="utf-8")
+        fields_info = file_read.readlines()
+
+        for id, file_csv in enumerate(files_csv):
+            field_info_list = fields_info[id+1].split(',')
             player = []
+            file_csv = file_csv.replace('\\', '/')
             filename = file_csv.replace(path_csv_folder, '')
             file_to_read = open(file_csv, 'r')
             read_values = file_to_read.readlines()
@@ -168,9 +184,9 @@ class Write_log:
                     lati = float(value_temp[1]) / count
                     speed = float(value_temp[2]) / count
                     playing = self.check_activation(speed)
-                    infield = self.check_in_field(longi, lati, path_field_info)
+                    infield = self.check_in_field(longi, lati, field_info_list)
                     # 만약 속도와 위치 모두가 활동성이 있다고 확인되면 True고 아니면 False이다.
-                    if playing == True and infield == True:
+                    if playing and infield:
                         check = True
                     else:
                         check = False
@@ -335,18 +351,22 @@ class Write_log:
                 in_dui = stamp_true_sh - stamp_false_sh  # 해당시간 뒤 10개에 대한 true-false
 
                 if i == len(p) - 11:  # 반복문마지막에 다다랐을때 후반종료가 아니면 교체out으로 잡아주어야 한다.
-                    if p[i + 10][1] < end2_hour or (
-                            p[i + 10][1] == end2_hour and p[i + 10][2] < end2_minute):  # 끝나는 시간보다 더 일찍 기계가 꺼진경우(교체된경우)
-                        out_checker = 1
+                    if p[i + 10][1] < end2_hour or (p[i + 10][1] == end2_hour and p[i + 10][2] < end2_minute):  # 끝나는 시간보다 더 일찍 기계가 꺼진경우(교체된경우)
+                        numb=1
+                        while numb<11:
+                            hour_over = p[i][1] + numb
+                            minute_over = p[i][2] + numb
+                            p.append([p[i][0], hour_over, minute_over, False])
+                            numb = numb + 1
 
                 if (p[i][1] > start1_hour or (p[i][1] == start1_hour and p[i][2] > start1_minute)) and (
                         p[i][1] < end1_hour or (p[i][1] == end1_hour and p[i][2] < end1_minute)):  # 전반전동안에
                     if p[i + 8][1] > end1_hour or (p[i + 8][1] == end1_hour and p[i + 8][
-                        2] > end1_minute) and out_checker == 0:  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        2] > end1_minute):  # 전반전 끝에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     if (p[i - 1][3] == True and p[i][
-                        3] == False and out_ap > 3 and out_dui > 3) or out_checker == 1:  # 전반전 교체out찾기
+                        3] == False and out_ap > 3 and out_dui > 3):  # 전반전 교체out찾기
                         pout_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 전반전 교체in찾기
                         pin_fh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
@@ -357,23 +377,23 @@ class Write_log:
                         i = i + 1
                         continue
                     if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][
-                        2] < start2_minute) and out_checker == 0:  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     # 하프타임교체잡는 알고리즘 다시 생각해보자->전반에뛰다가 후반에는 안뛰는 그런걸로 찾아줘야 할 것 같다.
                     if (p[i - 1][3] == True and p[i][
-                        3] == False and out_ap > 3 and out_dui > 3) or out_checker == 1:  # 하프타임 교체out찾기
+                        3] == False and out_ap > 3 and out_dui > 3):  # 하프타임 교체out찾기
                         pout_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 하프타임 교체in찾기
                         pin_h.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                 if (p[i][1] > start2_hour or (p[i][1] == start2_hour and p[i][2] > start2_minute)) and (
                         p[i][1] < end2_hour or (p[i][1] == end2_hour and p[i][2] < end2_minute)):  # 후반전동안에
                     if p[i - 8][1] < start2_hour or (p[i - 8][1] == start2_hour and p[i - 8][
-                        2] < start2_minute) and out_checker == 0:  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
+                        2] < start2_minute):  # 후반전 맨 앞에 걸릴즘 즉 단체로 쉬러가는거는 교체아웃안잡는다
                         i = i + 1
                         continue
                     if (p[i - 1][3] == True and p[i][
-                        3] == False and out_ap > 3 and out_dui > 3) or out_checker == 1:  # 후반전 교체out찾기
+                        3] == False and out_ap > 3 and out_dui > 3):  # 후반전 교체out찾기
                         pout_sh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
                     if p[i - 1][3] == False and p[i][3] == True and in_ap > 3 and in_dui > 3:  # 후반전 교체in찾기
                         pin_sh.append([p[i][0].replace('.csv', ''), p[i][1], p[i][2]])
@@ -386,30 +406,30 @@ class Write_log:
         pout_sh = self.sort_sub(pout_sh)
         pin_sh = self.sort_sub(pin_sh)
 
-        if (len(pout_sh) + len(pout_fh) + len(pout_h)) != (len(pin_fh) + len(pin_h) + len(pin_sh)):
-            pout_fh, pin_fh = self.check_none_sub(pout_fh, pin_fh)
-            pout_h, pin_h = self.check_none_sub(pout_h, pin_h)
-            pout_sh, pin_sh = self.check_none_sub(pout_sh, pin_sh)
+        pout_fh, pin_fh = self.check_none_sub(pout_fh, pin_fh)
+        pout_h, pin_h = self.check_none_sub(pout_h, pin_h)
+        pout_sh, pin_sh = self.check_none_sub(pout_sh, pin_sh)
 
         return sub_list
 
     # 교체선수의 시간정보와 등번호 정보를 담은 리스트들을 인자로 전달받음
     def check_none_sub(self, pout, pin):
-
         if len(pout) > len(pin):  # 교체 나가는 선수가 더 많이 잡혔을경우
             i = 0
             while (i < len(pout)):
                 j = 0
                 while (j < len(pin)):
-                    if abs((pout[i][1] * 60 + pout[i][2]) - (
-                            pin[j][1] * 60 + pin[j][2])) < 4:  # 같은시간대로 판단이 되는 시간이 있으면은그냥넘어간다.
+                    if abs((pout[i][1] * 60 + pout[i][2]) - (pin[j][1] * 60 + pin[j][2])) < 3:
                         break
-                    elif abs((pout[i][1] * 60 + pout[i][2]) - (
-                            pin[j][1] * 60 + pin[j][2])) > 3:  # 만약에 같은시간대로 판단이 안되는 경우에는 계속비교
-                        j = j + 1
+                    elif abs((pout[i][1] * 60 + pout[i][2]) - (pin[j][1] * 60 + pin[j][2])) > 3:
+                        if (pout[i][1] * 60 + pout[i][2])<(pin[j][1] * 60 + pin[j][2]):
+                            pin.append(['', pout[i][1], pout[i][2]])
+                            pin = self.sort_sub(pin)
+                            break
                         if j == len(pin):
                             pin.append(['', pout[i][1], pout[i][2]])
                             pin = self.sort_sub(pin)
+                    j = j + 1
                 i = i + 1
 
         elif len(pout) < len(pin):  # 교체들어오는선수가 더 많이 잡혔을 경우
@@ -417,30 +437,31 @@ class Write_log:
             while (i < len(pin)):
                 j = 0
                 while (j < len(pout)):
-                    if abs((pin[i][1] * 60 + pin[i][2]) - (pout[j][1] * 60 + pout[j][2])) < 4:
+                    if abs((pin[i][1] * 60 + pin[i][2]) - (pout[j][1] * 60 + pout[j][2])) < 3:
                         break
                     elif abs((pin[i][1] * 60 + pin[i][2]) - (pout[j][1] * 60 + pout[j][2])) > 3:
-                        j = j + 1
+                        if (pin[i][1] * 60 + pin[i][2])<(pout[j][1] * 60 + pout[j][2]):
+                            pout.append(['', pin[i][1], pin[i][2]])
+                            pout = self.sort_sub(pout)
+                            break
                         if j == len(pout):
                             pout.append(['', pin[i][1], pin[i][2]])
                             pout = self.sort_sub(pout)
+                    j = j + 1
                 i = i + 1
+
         return pout, pin
 
     # log를 써주는 함수
     def write_log_file(self, sub_list, path_to_save, time_list):
-        write_order = '//event,time,player_out,player_in'
+        write_order = 'event,time,player_out,player_in'
         start1_hour, start1_minute, end1_hour, end1_minute = time_list[0], time_list[1], time_list[2], time_list[3]
         start2_hour, start2_minute, end2_hour, end2_minute = time_list[4], time_list[5], time_list[6], time_list[7]
         pout_fh, pin_fh, pout_h = sub_list[0], sub_list[1], sub_list[2]
         pin_h, pout_sh, pin_sh = sub_list[3], sub_list[4], sub_list[5]
 
         # 디렉토리가 없으면은 생성해준다.
-        try:
-            if not os.path.exists(path_to_save):
-                os.makedirs(path_to_save)
-        except OSError:
-            print('Error: Creating directory.' + path_to_save)
+        self.create_dir(path_to_save)
 
         file_to_write = open(path_to_save + 'log.csv', 'w')
         file_to_write.write(write_order + '\n')
@@ -470,16 +491,12 @@ class Write_log:
         file_to_write.close()
 
     # 모든 메소드들을 콜해주는 함수
-    def write_playing(self,players,path):
+    def write_playing(self, players, path):
         # 디렉토리가 없으면은 생성해준다.
-        try:
-            if not os.path.exists(path):
-                os.makedirs(path)
-        except OSError:
-            print('Error: Creating directory.' + path)
+        self.create_dir(path)
 
         for p in players:
-            i=0
+            i = 0
             filename=p[i][0][:len(p[i][0])-4]+'.txt'
             pwrite=open(path+filename,'w')
             while i<len(p):
@@ -487,7 +504,7 @@ class Write_log:
                 i=i+1
     # 애들상태뽑아내는 파일임
 
-    def detect_playing(self, path_csv_folder, path_field_info, name, path_to_save,path_statu_player):
+    def detect_playing(self, path_csv_folder, path_field_info, path_to_save, path_statu_player, name):
         players = []
         time_table = []
         time_list = []
@@ -513,20 +530,7 @@ class Write_log:
         players = self.read_csv_files(players, files_csv, path_csv_folder, path_field_info)
         time_table = self.find_time_table(time_table, players)
         time_table = self.check_number_playing_in_time_table(time_table, players)
-        self.write_playing(players,path_statu_player)
+        self.write_playing(players, path_statu_player)
         time_list = self.detect_start_end_time(time_table, time_list)
         sub_list = self.find_sub_list(players, sub_list, time_list)
         self.write_log_file(sub_list, path_to_save, time_list)
-
-
-if __name__ == "__main__":
-    csv_path = 'data/3. data_csv_second_average/'
-    field = 'data/8. data_field_find/'
-    path_to_save = 'data/9. data_log_csv/'
-    path_statu_player= 'data/40. data_statu_player/'
-
-    name_of_dir = '드래곤즈'
-
-    Write_log()
-    writeObject = Write_log()
-    writeObject.detect_playing(csv_path, field, name_of_dir, path_to_save,path_statu_player)
