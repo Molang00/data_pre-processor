@@ -236,27 +236,3 @@ class NoiseFinder:
                 state = ', Abnormal\n'
             file_to_write_info.write(read_files_name[id]+state)
         file_to_write_info.close()
-
-
-
-start_time = time.time()
-
-if __name__ == "__main__":
-    # argv를 이용해 필요한 dir명을 전달받아 이용하면 유용할 것
-    noisefinderObject = NoiseFinder()
-
-    root_for_read = 'data/3. data_csv_second_average/'
-    root_for_read_field = 'data/8. data_field_find/'
-    root_for_write = 'data/30. data_noise/'
-    need_to_compute_dir = '20180613_훈련 2차_H_포항 스틸러스/'
-    noisefinderObject.find_noise_in_data(root_for_read, root_for_read_field, root_for_write, need_to_compute_dir)
-    need_to_compute_dir = '20180622_훈련_A_전남 드래곤즈/'
-    noisefinderObject.find_noise_in_data(root_for_read, root_for_read_field, root_for_write, need_to_compute_dir)
-    need_to_compute_dir = '20180625_훈련_A_포항 스틸러스/'
-    noisefinderObject.find_noise_in_data(root_for_read, root_for_read_field, root_for_write, need_to_compute_dir)
-    need_to_compute_dir = '20180626_2018 R리그 - 10R (v경남)_H_전남 드래곤즈/'
-    noisefinderObject.find_noise_in_data(root_for_read, root_for_read_field, root_for_write, need_to_compute_dir)
-    need_to_compute_dir = '20180626_훈련_H_전남 드래곤즈/'
-    noisefinderObject.find_noise_in_data(root_for_read, root_for_read_field, root_for_write, need_to_compute_dir)
-    end_time = time.time()-start_time
-    print('noise_finder : '+str(format(end_time, '.6f'))+'sec\n')
