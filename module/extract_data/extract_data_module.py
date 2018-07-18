@@ -40,7 +40,6 @@ class Extract_data:
 
             file_summarized = path_output_folder + file_csv[len(path_csv_folder):]
             file_summarized = file_summarized[:len(file_summarized)-3]+'csv'
-            print(file_summarized)
             file_to_read = open(file_csv,'r')
             file_to_write = open(file_summarized,'w')
             file_to_write.writelines(write_order+'\n')
@@ -121,12 +120,3 @@ class Extract_data:
             file_to_write.write('\n')
 
             file_to_read.close()
-
-if __name__=="__main__":
-    root_csv = 'data/2. data_csv_format/'
-    root_summarized = 'data/3. data_csv_second_average/'
-    name_of_dir = '수원'
-
-    Extract_data()
-    extractObject = Extract_data()
-    extractObject.summarize_csv(root_csv + name_of_dir, root_summarized +name_of_dir)
