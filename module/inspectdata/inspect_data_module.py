@@ -2,26 +2,10 @@ import glob
 import os
 import time
 import openpyxl
-
+from helper import common_os_helper
 
 class Inspect_data:
     Players = []
-
-    def creat_dir(self, directory):
-        # directory dir명이 포함도니 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except:
-            print('Error: Creating directory. '+directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
-        return path_string
 
     def find_file_name(self, name_string, place):
         # name_string 폴더의 이름을 string형태로 저장
@@ -165,10 +149,10 @@ class Inspect_data:
     def find_diff_log(self, path_read_xl_folder, path_read_log_folder, path_write_folder, name_of_dir):
         # excel file과 log.csv의 다른 부분을 error로 판단하여 file에 기록
 
-        path_read_xl_folder = self.check_slash(path_read_xl_folder)
-        path_read_log_folder = self.check_slash(path_read_log_folder)
-        path_write_folder = self.check_slash(path_write_folder)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_xl_folder = common_os_helper.check_slash(path_read_xl_folder)
+        path_read_log_folder = common_os_helper.check_slash(path_read_log_folder)
+        path_write_folder = common_os_helper.check_slash(path_write_folder)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_write_folder = path_write_folder+name_of_dir
 
         file_to_read_log = open(path_read_log_folder+name_of_dir+'log.csv')
@@ -256,9 +240,9 @@ class Inspect_data:
     def look_up_files_stable(self, path_raw_data, path_write, name_of_dir):
         # 기기로부터 안정적으로 정보를 받아오지 않았다면 error로 판단, 기록
 
-        path_raw_data = self.check_slash(path_raw_data)
-        path_write = self.check_slash(path_write)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_raw_data = common_os_helper.check_slash(path_raw_data)
+        path_write = common_os_helper.check_slash(path_write)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_raw_data = path_raw_data + name_of_dir
         path_write = path_write + name_of_dir
 
@@ -292,10 +276,10 @@ class Inspect_data:
 
     def look_up_player(self, path_read_xl, path_raw_data, path_write, name_of_dir):
         # excel file에 뛰었다고 기록된 선수가 log.csv에 뛰었다고 기록되어 있고, 데이터도 있는지 확인, 기록
-        path_read_xl = self.check_slash(path_read_xl)
-        path_raw_data = self.check_slash(path_raw_data)
-        path_write = self.check_slash(path_write)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_xl = common_os_helper.check_slash(path_read_xl)
+        path_raw_data = common_os_helper.check_slash(path_raw_data)
+        path_write = common_os_helper.check_slash(path_write)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_raw_data = path_raw_data+name_of_dir
         path_write = path_write+name_of_dir
 

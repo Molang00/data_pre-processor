@@ -1,25 +1,8 @@
 import glob
 import os
-import time
-
+from helper import common_os_helper
 
 class EditData:
-
-    def create_dir(self, directory):
-        # directory dir명이 포함된 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError:
-            print('Error: Creating directory. ' + directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
-            path_string = path_string + '/'
-        return path_string
 
     def time_calculate(self, time_string, term_second_int):
         time_list = time_string.split('.')
@@ -69,16 +52,16 @@ class EditData:
         # name_of_dir 파일을 읽고 쓸 dir name을 string으로 저장
 
         # 경로의 예외처리와 최종 경로 지정
-        path_read_csv_folder = self.check_slash(path_read_csv_folder)
-        path_read_error_folder = self.check_slash(path_read_error_folder)
-        path_write_folder = self.check_slash(path_write_folder)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_csv_folder = common_os_helper.check_slash(path_read_csv_folder)
+        path_read_error_folder = common_os_helper.check_slash(path_read_error_folder)
+        path_write_folder = common_os_helper.check_slash(path_write_folder)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_read_csv_folder = path_read_csv_folder + name_of_dir + '*.csv'
         path_read_error_folder = path_read_error_folder + name_of_dir + 'error.csv'
         path_write_folder = path_write_folder + name_of_dir
 
         # 파일을 쓸 위치에 폴더를 만들고 error.csv 열기
-        self.create_dir(path_write_folder)
+        common_os_helper.create_dir(path_write_folder)
         file_to_error_read = open(path_read_error_folder, 'r')
         read_error_values = file_to_error_read.readlines()
         index_error = 1
@@ -148,8 +131,8 @@ class EditData:
     def split_file(Start1_18 ,End2_18, Start1_17, End2_17,path_read_csv, name_of_dir):
         name_of_dir17 = name_of_dir.replace('18', '17')
         name_of_dir18 = 'temp'
-        self.create_dir(path_read_csv+name_of_dir17)
-        self.create_dir(path_read_csv+name_of_dir18)
+        common_os_helper.create_dir(path_read_csv+name_of_dir17)
+        common_os_helper.create_dir(path_read_csv+name_of_dir18)
 
         Start1_18.replace(':', '.')
         Start1_18 = Start1_18+'.0'

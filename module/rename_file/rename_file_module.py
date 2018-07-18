@@ -4,7 +4,7 @@ import time
 import shutil
 import openpyxl
 from module.editdata.edit_data_module import EditData
-
+from helper import common_os_helper
 
 class Rename_file:
 
@@ -41,9 +41,9 @@ class Rename_file:
         return new_name
 
     def detect_games(self, path_read_csv, path_read_xl, name_of_dir):
-        path_read_csv = self.check_slash(path_read_csv)
-        path_read_xl = self.check_slash(path_read_xl)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_csv = common_os_helper.check_slash(path_read_csv)
+        path_read_xl = common_os_helper.check_slash(path_read_xl)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
 
         try:
             file_read_xl = openpyxl.load_workbook(path_read_xl+self.find_file_name(name_of_dir, 'H', 'xlsx'))
@@ -70,12 +70,12 @@ class Rename_file:
         # path_read_info_folder serial_num,back_num으로 이루어진 .csv file이 있는 path를 string으로 저장
         # name_of_dir 파일을 읽고 쓸 dir name을 string으로 저장
 
-        path_target_folder = self.check_slash(path_target_folder)
-        path_read_info_folder = self.check_slash(path_read_info_folder)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_target_folder = common_os_helper.check_slash(path_target_folder)
+        path_read_info_folder = common_os_helper.check_slash(path_read_info_folder)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_target_folder = path_target_folder+name_of_dir
 
-        self.create_dir(path_target_folder+'noneed/')
+        common_os_helper.create_dir(path_target_folder+'noneed/')
 
         # 현재 target인 팀이 home인지 away인지 모르기 때문에 두가지 경우 모두 시도
         try:

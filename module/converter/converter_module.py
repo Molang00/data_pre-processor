@@ -1,40 +1,23 @@
 import glob
 import os
-import time
+from helper import common_os_helper
 from helper.gp_convert.gp2ochconverter import *
 
 
 class Converter:
-
-    # dir를 생성
-    def create_dir(self, directory):
-        # directory dir명이 포함된 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError:
-            print('Error: Creating directory. '+directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
-        return path_string
 
     def convert_gp_to_och(self, path_gp, path_och, name_of_dir):
         # path_gp 읽을 gp파일이 저장된 path를 string으로 저장
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_gp = self.check_slash(path_gp)
-        path_och = self.check_slash(path_och)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_gp = common_os_helper.check_slash(path_gp)
+        path_och = common_os_helper.check_slash(path_och)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_gp = path_gp + name_of_dir + '*.gp'
         path_och = path_och + name_of_dir
 
-        self.create_dir(path_och)
+        common_os_helper.create_dir(path_och)
 
         files_gp = glob.glob(path_gp)
 
@@ -54,13 +37,13 @@ class Converter:
         # path_csv csv파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_och = self.check_slash(path_och)
-        path_csv = self.check_slash(path_csv)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_och = common_os_helper.check_slash(path_och)
+        path_csv = common_os_helper.check_slash(path_csv)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_och = path_och + name_of_dir + '*.och'
         path_csv = path_csv + name_of_dir
-
-        self.create_dir(path_csv)
+        
+        common_os_helper.create_dir(path_csv)
 
         files_och = glob.glob(path_och)
         # .csv의 경우 가장 첫번째 줄에 이후 정보들의 저장 순서를 저장함
@@ -109,13 +92,13 @@ class Converter:
         # path_och och파일을 쓰고자 하는 path를 string으로 저장
         # name_of_dir 읽을 csv파일과 och파일을 쓰고자 하는 dir name을 string으로 저장
 
-        path_och = self.check_slash(path_och)
-        path_csv = self.check_slash(path_csv)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_och = common_os_helper.check_slash(path_och)
+        path_csv = common_os_helper.check_slash(path_csv)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_och = path_och + name_of_dir
         path_csv = path_csv + name_of_dir+'*.csv'
 
-        self.create_dir(path_och)
+        common_os_helper.create_dir(path_och)
 
         files_csv = glob.glob(path_csv)
 
