@@ -16,7 +16,9 @@ class Converter:
         name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_gp = path_gp + name_of_dir + '*.gp'
         path_och = path_och + name_of_dir
+
         common_os_helper.create_dir(path_och)
+
         files_gp = glob.glob(path_gp)
 
         for file_gp in files_gp:
