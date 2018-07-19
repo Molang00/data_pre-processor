@@ -8,23 +8,6 @@ from helper import common_os_helper
 
 class Rename_file:
 
-    def create_dir(self, directory):
-        # directory dir명이 포함된 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError:
-            print('Error: Creating directory. '+directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
-        return path_string
-
-
     def find_file_name(self, name_string, place, type = 'csv', state = '18'):
         # name_string 폴더의 이름을 string형태로 저장 ex) 'A-01_U18_서울'
         # place home이라면 H, away라면 A를 저장     ex)'H' 또는 'A'
