@@ -119,9 +119,8 @@ class Controller(QMainWindow, form_class):
         self.button_widget_list[2].clicked.connect(self.filter_process)
         self.button_widget_list[3].clicked.connect(self.output_process)
         self.button_widget_list[4].clicked.connect(self.inspect_process)
-        self.button_widget_list[5].clicked.connect(lambda: self.all_process())
-
-        self.button_widget_list[6].clicked.connect(lambda: self.fetch_process(root_gp, address_ftp_list, access_date))
+        self.button_widget_list[5].clicked.connect(self.all_process)
+        self.button_widget_list[6].clicked.connect(self.fetch_process)
 
     def convert_process(self):
 
@@ -225,22 +224,22 @@ class Controller(QMainWindow, form_class):
         is_log = self.checkbox_list[3][1].isChecked()
 
         try:
-                for name_folder in name_folder_list:
-                    if is_och:
-                        print("OUTPUT_OCH_START")
-                        object_converter = Converter()
-                        object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
-                        print("OUTPUT_OCH_END")
+            for name_folder in name_folder_list:
+                if is_och:
+                    print("OUTPUT_OCH_START")
+                    object_converter = Converter()
+                    object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
+                    print("OUTPUT_OCH_END")
 
-                    if is_log:
-                        print("OUTPUT_LOG_START")
-                        Write_log()
-                        Object_write_log = Write_log()
-                        Object_write_log.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field,
-                                                        path_root_folder_for_log, path_write_statu_player, name_folder)
-                        print("OUTPUT_LOG_END")
-            except Exception as e:
-                print(e)
+                if is_log:
+                    print("OUTPUT_LOG_START")
+                    Write_log()
+                    Object_write_log = Write_log()
+                    Object_write_log.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field,
+                                                    path_root_folder_for_log, path_write_statu_player, name_folder)
+                    print("OUTPUT_LOG_END")
+        except Exception as e:
+            print(e)
 
     def inspect_process(self):
 
