@@ -1,24 +1,26 @@
 import pandas as pd
-import numpy as np
 import math
 import glob
 import os
 
 # gps좌표를 meter scale의 distance로 바꾸어준다
 class Find_field_csv:
+
     def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate=1):
-
-        def expansion(point, center, rate):
-            x = center[0] + (point[0] - center[0]) * rate
-            y = center[1] + (point[1] - center[1]) * rate
-            return (x, y)
-
         center = ((pointA[0] + pointB[0] + pointC[0] + pointD[0]) / 4, (pointA[1] + pointB[1] + pointC[1] + pointD[1]) / 4)
-        new_A = expansion(pointA, center, expansion_rate)
-        new_B = expansion(pointB, center, expansion_rate)
-        new_C = expansion(pointC, center, expansion_rate)
-        new_D = expansion(pointD, center, expansion_rate)
+        new_A = self.expansion(pointA, center, expansion_rate)
+        new_B = self.expansion(pointB, center, expansion_rate)
+        new_C = self.expansion(pointC, center, expansion_rate)
+        new_D = self.expansion(pointD, center, expansion_rate)
+
+
         return new_A, new_B, new_C, new_D
+
+    def expansion(self, point, center, rate):
+        x = center[0] + (point[0] - center[0]) * rate
+        y = center[1] + (point[1] - center[1]) * rate
+        return (x, y)
+
 
     def check_slash(self, path_string):
         # path_string 원하는 경로를 string으로 저장
@@ -95,6 +97,7 @@ class Find_field_csv:
         return output
 
     def find_field_csv_file(self, csv_file_path, field_info_path):
+        tmp_field_data = []
         output = []
         with open(csv_file_path, 'r') as f:
             lines = f.readlines()
@@ -107,8 +110,10 @@ class Find_field_csv:
                     print(e)
                 field_data = self.findField(float(lon), float(lat), field_info_path)
                 if field_data != []:
-                    output = field_data
-                    break
+                    if output == field_data: #단위 시간 이후 같은 경기장에 있을 경우에 break and return 하도록 한다
+                        break
+                    else:
+                        output = field_data
                 i += 3000  # 5분단위
         return output
 

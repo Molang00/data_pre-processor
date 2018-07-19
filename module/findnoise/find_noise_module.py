@@ -1,59 +1,10 @@
 import math
 import glob
-import os
-import time
 import numpy
-
+from helper import common_os_helper
+from helper.find_field_csv import Find_field_csv
 
 class NoiseFinder:
-
-    def create_dir(self, directory):
-        # directory dir명이 포함된 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError:
-            print('Error: Creating directory. '+directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
-        return path_string
-
-    def checkPointInRectangle(self, pointP, pointA, pointB, pointC, pointD):
-        def sign(pointP, pointA, pointB):
-            # distinguish side of point, criteria: line AB
-            updown = (pointP[0] - pointB[0]) * (pointA[1] - pointB[1]) - (
-                    pointP[1] - pointB[1]) * (pointA[0] - pointB[0])
-            if updown >= 0:
-                output = True
-            else:
-                output = False
-            return output
-
-        b1 = sign(pointP, pointA, pointB)
-        b2 = sign(pointP, pointB, pointC)
-        b3 = sign(pointP, pointC, pointD)
-        b4 = sign(pointP, pointD, pointA)
-        insideSquare = (b1 and b2 and b3 and b4) or (not (b1 or b2 or b3 or b4))
-
-        return not insideSquare
-
-    def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate):
-
-        def expansion(point, center, rate):
-            x = center[0] + (point[0]-center[0])*rate
-            y = center[1] + (point[1]-center[1])*rate
-            return (x, y)
-        center = ((pointA[0]+pointB[0]+pointC[0]+pointD[0])/4,(pointA[1]+pointB[1]+pointC[1]+pointD[1])/4)
-        new_A = expansion(pointA, center, expansion_rate)
-        new_B = expansion(pointB, center, expansion_rate)
-        new_C = expansion(pointC, center, expansion_rate)
-        new_D = expansion(pointD, center, expansion_rate)
-        return new_A, new_B, new_C, new_D
 
     def str_to_time(self, time_str_csv):
         time_str = time_str_csv[0]
@@ -102,10 +53,10 @@ class NoiseFinder:
         # path_write_folder 파일을 쓰고자 하는 path를 string으로 저장
         # nmae_of_dir 읽을 파일과 쓰고자 하는 파일의 dir name을 string으로 저장
 
-        path_read_folder = self.check_slash(path_read_folder)
-        path_read_field_folder = self.check_slash(path_read_field_folder)
-        path_write_folder = self.check_slash(path_write_folder)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_folder = common_os_helper.check_slash(path_read_folder)
+        path_read_field_folder = common_os_helper.check_slash(path_read_field_folder)
+        path_write_folder = common_os_helper.check_slash(path_write_folder)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_read_folder = path_read_folder+name_of_dir
         path_read_field_folder = path_read_field_folder+name_of_dir
         path_write_folder = path_write_folder+name_of_dir
@@ -113,7 +64,7 @@ class NoiseFinder:
         file_to_read_field = open(path_read_field_folder+'fieldmatch.txt', 'r', encoding="utf-8")
         read_field = file_to_read_field.readline()
 
-        self.create_dir(path_write_folder)
+        common_os_helper.create_dir(path_write_folder)
         file_to_write = open(path_write_folder+'error.csv', 'w')
         write_order = 'path,filename,start_time,end_time,error_code\n'
         file_to_write.write(write_order)
@@ -146,7 +97,8 @@ class NoiseFinder:
                 pointB = (float(lonB[1:]), float(latB[1:]))
                 pointC = (float(lonC[1:]), float(latC[1:]))
                 pointD = (float(lonD[1:]), float(latD[1:len(latD)-2]))
-                pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.2)
+                find_object = Find_field_csv()
+                pointA, pointB, pointC, pointD = find_object.expand_field(pointA, pointB, pointC, pointD, 1.2)
             except:
                 ck_field = 0
 
@@ -195,7 +147,7 @@ class NoiseFinder:
                 latitude_float = float(value_csv_list[7])
                 pointP = (longitude_float, latitude_float)
 
-                if (ck_field and self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
+                if (ck_field and find_object.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
                         and value_list != read_values[len(read_values) - 1]:
                     if last_field == 0:
                         last_field = 1

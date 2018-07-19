@@ -1,92 +1,15 @@
 import glob
 import math
-import os
+from helper.find_field_csv import Find_field_csv
+from helper import common_os_helper
+
 
 
 class Write_log:
 
-    def create_dir(self, directory):
-        # directory dir명이 포함된 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError:
-            print('Error: Creating directory. ' + directory)
-
-    # expand_field함수에서 경기장 보정치만큼 필드크기를 늘려줌
-    def expand_field(self, pointA, pointB, pointC, pointD, expansion_rate=1):
-
-        def expansion(point, center, rate):
-            x = center[0] + (point[0] - center[0]) * rate
-            y = center[1] + (point[1] - center[1]) * rate
-            return (x, y)
-
-        center = (
-            (pointA[0] + pointB[0] + pointC[0] + pointD[0]) / 4, (pointA[1] + pointB[1] + pointC[1] + pointD[1]) / 4)
-        new_A = expansion(pointA, center, expansion_rate)
-        new_B = expansion(pointB, center, expansion_rate)
-        new_C = expansion(pointC, center, expansion_rate)
-        new_D = expansion(pointD, center, expansion_rate)
-        return new_A, new_B, new_C, new_D
-
-    # check_slash에서 파일경로에 슬래쉬를 마지막에 삽입
-
-    def check_slash(self, path_string):
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string) - 1] != '/' and path_string[len(path_string) - 1] != '\\':
-            # path_string = os.path.join(path_string, '/')
-            path_string = path_string + '/'
-        return path_string
-
-    # gps좌표를 meter scale의 distance로 바꾸어준다
-    def measure_position(self, lat1, lon1, lat2, lon2):
-        R = 6378.137
-        dLat = (lat1 - lat2) * math.pi / 180
-        dLon = (lon1 - lon2) * math.pi / 180
-        a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(lat1 * math.pi / 180) * math.cos(
-            lat2 * math.pi / 180) * math.sin(dLon / 2) * math.sin(dLon / 2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        d = R * c
-        return d * 1000
-
-    # 점의 위치가 직사각형 안에 있으면True 아니면 False를 return
-
-    def checkPointInRectangle(self, pointP, pointA, pointB, pointC, pointD):
-        b1 = False
-        b2 = False
-
-        if self.measure_position(pointP[0], pointP[1], pointA[0], pointA[1]) < 200:
-            b1 = self.checkPointInTriangle(pointP, pointA, pointB, pointC)
-            b2 = self.checkPointInTriangle(pointP, pointC, pointD, pointA)
-
-        insideSquare = (b1 or b2)
-        return insideSquare
-
-    # 점의 위치가 삼각형 안에있으면 True 아니면 False를 return
-
-    def checkPointInTriangle(self, pointP, pointA, pointB, pointC):
-
-        def sign(pointP, pointA, pointB):
-            # distinguish side of point, criteria: line AB
-            updown = (pointP[0] - pointB[0]) * (pointA[1] - pointB[1]) - (pointP[1] - pointB[1]) * (
-                    pointA[0] - pointB[0])
-            if updown >= 0:
-                output = True
-            else:
-                output = False
-
-            return output
-
-        b1 = sign(pointP, pointA, pointB)
-        b2 = sign(pointP, pointB, pointC)
-        b3 = sign(pointP, pointC, pointA)
-
-        insideTriangle = ((b1 == b2) and (b2 == b3))
-
-        return insideTriangle
-
     # 필드 정보를 읽어들여서 선수가 필드 안에있는지 바깥에 있는지 check해서 안에있으면 true, 바깥에 있으면 False
     def check_in_field(self, longitude, latitude, data):
+
         try:
             data[11] = data[11].replace("]", '0')
             # 경로,파일명,번호,구장이름,위도,경도
@@ -103,9 +26,13 @@ class Write_log:
         pointD = (lonD, latD)
 
         # expandfield로 필드를 찾을 때 보정값을 넣은 후에
-        pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        try:
+            find_object= Find_field_csv()
+            pointA, pointB, pointC, pointD = find_object.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        except Exception as e:
+            print(e)
         # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
-        if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
+        if find_object.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
             return True
         else:
             return False
@@ -142,7 +69,7 @@ class Write_log:
 
     def read_csv_files(self, players, files_csv, path_csv_folder, path_field_info):
         # csvfolder에 있는 csvfile들을 읽어들여서 활동 여부를 판단해주는 리스트를 만든다.
-        path_csv_folder = self.check_slash(path_csv_folder)
+        path_csv_folder = common_os_helper.check_slash(path_csv_folder)
 
         file_read = open(path_field_info, 'r', encoding="utf-8")
         fields_info = file_read.readlines()
@@ -461,7 +388,7 @@ class Write_log:
         pin_h, pout_sh, pin_sh = sub_list[3], sub_list[4], sub_list[5]
 
         # 디렉토리가 없으면은 생성해준다.
-        self.create_dir(path_to_save)
+        common_os_helper.create_dir(path_to_save)
 
         file_to_write = open(path_to_save + 'log.csv', 'w')
         file_to_write.write(write_order + '\n')
@@ -493,7 +420,7 @@ class Write_log:
     # 모든 메소드들을 콜해주는 함수
     def write_playing(self, players, path):
         # 디렉토리가 없으면은 생성해준다.
-        self.create_dir(path)
+        common_os_helper.create_dir(path)
 
         for p in players:
             i = 0
@@ -518,15 +445,14 @@ class Write_log:
         # 파일과 폴더 경로이름을 지정해주는 부분
         path_csv_folder = path_csv_folder + name
         path_field_info = path_field_info + name + '/fieldmatch.txt'
-        path_csv_folder = self.check_slash(path_csv_folder)
+        path_csv_folder = common_os_helper.check_slash(path_csv_folder)
         files_csv = glob.glob(path_csv_folder + '*.csv')
         path_to_save = path_to_save + name
-        path_to_save = self.check_slash(path_to_save)
+        path_to_save = common_os_helper.check_slash(path_to_save)
         path_statu_player=path_statu_player+name
-        path_statu_player=self.check_slash(path_statu_player)
+        path_statu_player=common_os_helper.check_slash(path_statu_player)
         for f in files_csv:
             f = f.replace('\\', '/')
-
         players = self.read_csv_files(players, files_csv, path_csv_folder, path_field_info)
         time_table = self.find_time_table(time_table, players)
         time_table = self.check_number_playing_in_time_table(time_table, players)

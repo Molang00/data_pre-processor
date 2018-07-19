@@ -142,6 +142,7 @@ class Controller(QMainWindow, form_class):
 
             if is_gp_to_och:
                 print("Gp_to_och_START")
+
                 object_converter = Converter()
                 object_converter.convert_gp_to_och(path_root_folder_gp, path_root_folder_och,
                                                    name_of_dir=name_folder)
@@ -151,6 +152,7 @@ class Controller(QMainWindow, form_class):
                 object_converter = Converter()
                 object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
                                                     name_of_dir=name_folder)
+
                 object_rename = Rename_file()
                 object_rename.rename_csv_file(path_root_folder_csv, path_root_num_info, root_for_log, name_of_dir=name_folder)
                 print("Och_to_csv_END")
