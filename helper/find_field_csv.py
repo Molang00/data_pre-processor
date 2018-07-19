@@ -142,6 +142,31 @@ class Find_field_csv:
             lines = "\n".join(e[0] + ", " + str(e[1]) for e in outputList)
             f.writelines(lines)
 
+# 필드 정보를 읽어들여서 선수가 필드 안에있는지 바깥에 있는지 check해서 안에있으면 true, 바깥에 있으면 False
+    def check_in_field(self, longitude, latitude, data):
+        try:
+            data[11] = data[11].replace("]", '0')
+            # 경로,파일명,번호,구장이름,위도,경도
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = data[4:]
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = float(lonA), float(latA), float(lonB), float(latB), float(
+                lonC), float(latC), float(lonD), float(latD)
+        except:
+            return False
+
+        pointP = (longitude, latitude)
+        pointA = (lonA, latA)
+        pointB = (lonB, latB)
+        pointC = (lonC, latC)
+        pointD = (lonD, latD)
+
+        # expandfield로 필드를 찾을 때 보정값을 넣은 후에
+        pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
+        if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
+            return True
+        else:
+            return False
+
 
 if __name__ == "__main__":
     # 현재는 data/2.data_csv_format/폴더만 하는데 이것도 선택할 수 있게 인자로 처리할 수 있을 것 같고, 그경우마다 위에 시간체크하는거 달라질수 있을듯
