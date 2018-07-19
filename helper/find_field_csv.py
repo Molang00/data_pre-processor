@@ -73,7 +73,7 @@ class Find_field_csv:
         return insideTriangle
 
     # parsedfieldpath는 output.csv를 읽히는 것이다.
-    def findField(self, longitude, latitude, parsedFieldFilePath):
+    def find_in_field(self, longitude, latitude, parsedFieldFilePath):
         df = pd.read_csv(parsedFieldFilePath)
         output = []
         for i in range(len(df)):
@@ -106,7 +106,8 @@ class Find_field_csv:
                     lon, lat = lines[i + 1].split(',')[7:9]  # 10hz기준
                 except Exception as e:
                     print(e)
-                field_data = self.findField(float(lon), float(lat), field_info_path)
+
+                field_data = self.find_in_field(float(lon), float(lat), field_info_path)
                 if field_data != []:
                     if output == field_data: #단위 시간 이후 같은 경기장에 있을 경우에 break and return 하도록 한다
                         break

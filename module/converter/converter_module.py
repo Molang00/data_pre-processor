@@ -32,6 +32,8 @@ class Converter:
             if os.path.getsize(file_och) < 1000:
                 os.remove(file_och)
 
+
+
     def convert_och_to_csv(self, path_och, path_csv, name_of_dir):
         # path_och 읽을 och파일이 저장된 path를 string으로 저장
         # path_csv csv파일을 쓰고자 하는 path를 string으로 저장

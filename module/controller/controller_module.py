@@ -106,7 +106,22 @@ class Controller(QMainWindow, form_class):
         path_player_num_info = 'helper/1. number_info/'
         path_all_field_info = 'helper/output.csv'
 
-        address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")]
+        root_gp = "data/0. data_gp_format"
+        root_och = 'data/1. data_och_format/'
+        root_csv = 'data/2. data_csv_format/'
+        root_summarized = 'data/3. data_csv_second_average/'
+        root_for_editted_file = 'data/5. data_csv_cut_error/'
+        root_for_log_excel = 'data/7. data_log_excel/'
+        root_for_field = 'data/8. data_field_find/'
+        root_for_log = 'data/9. data_log_csv/'
+        root_for_noise = 'data/30. data_noise/'
+        root_for_inspect = 'data/31. data_inspect/'
+        path_statu_player = 'data/40. data_statu_player/'
+        root_for_result_och = 'data/100. data_result'
+        path_player_num_info = 'data/7. data_log_excel/'  # 'helper/1. number_info/'
+        path_all_field_info = 'helper/output.csv'
+
+        address_ftp_list = [("175.207.29.99", 50021, "kleaguejunior2018", "junior2018")]
         access_date = 0
 
         self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och, root_csv,
@@ -138,23 +153,26 @@ class Controller(QMainWindow, form_class):
 
     def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, path_root_num_info,
                         root_for_log, name_folder_list, is_gp_to_och=True, is_och_to_csv=True):
+        try:
+            for name_folder in name_folder_list:
 
-        for name_folder in name_folder_list:
-
-            if is_gp_to_och:
-                print("Gp_to_och_START")
-                object_converter = Converter()
-                object_converter.convert_gp_to_och(path_root_folder_gp, path_root_folder_och,
-                                                   name_of_dir=name_folder)
-                print("Gp_to_och_END")
-            if is_och_to_csv:
-                print("Och_to_csv_START")
-                object_converter = Converter()
-                object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
-                                                    name_of_dir=name_folder)
-                object_rename = Rename_file()
-                object_rename.rename_csv_file(path_root_folder_csv, path_root_num_info, root_for_log, name_of_dir=name_folder)
-                print("Och_to_csv_END")
+                if is_gp_to_och:
+                    print("Gp_to_och_START")
+                    object_converter = Converter()
+                    object_converter.convert_gp_to_och(path_root_folder_gp, path_root_folder_och,
+                                                       name_of_dir=name_folder)
+                    print("Gp_to_och_END")
+                if is_och_to_csv:
+                    print("Och_to_csv_START")
+                    object_converter = Converter()
+                    object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
+                                                        name_of_dir=name_folder)
+                    object_rename = Rename_file()
+                    object_rename.rename_csv_file(path_root_folder_csv, path_root_num_info, root_for_log, name_of_dir=name_folder)
+                    print("Och_to_csv_END")
+        except Exception as e:
+            print(e)
+            exit()
 
     def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field,
                         name_folder_list,
@@ -202,21 +220,23 @@ class Controller(QMainWindow, form_class):
                        name_folder_list,
                        is_och =True, is_log = True
                        ):
+        try:
+            for name_folder in name_folder_list:
+                if is_och:
+                    print("OUTPUT_OCH_START")
+                    object_converter = Converter()
+                    object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
+                    print("OUTPUT_OCH_END")
 
-        for name_folder in name_folder_list:
-            if is_och:
-                print("OUTPUT_OCH_START")
-                object_converter = Converter()
-                object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
-                print("OUTPUT_OCH_END")
-
-            if is_log:
-                print("OUTPUT_LOG_START")
-                Write_log()
-                Object_write_log = Write_log()
-                Object_write_log.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field,
-                                                path_root_folder_for_log, path_write_statu_player, name_folder)
-                print("OUTPUT_LOG_END")
+                if is_log:
+                    print("OUTPUT_LOG_START")
+                    Write_log()
+                    Object_write_log = Write_log()
+                    Object_write_log.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field,
+                                                    path_root_folder_for_log, path_write_statu_player, name_folder)
+                    print("OUTPUT_LOG_END")
+        except Exception as e:
+            print(e)
 
     def inspect_process(self, root_csv, root_for_log_excel, root_for_log, root_for_inspect,
                        name_folder_list
@@ -228,7 +248,7 @@ class Controller(QMainWindow, form_class):
             object_inspect.do_inspection(root_for_log_excel, root_for_log, root_csv, root_for_inspect, name_folder)
             print("Inspect_data_END")
 
-    def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
+    def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("175.207.29.99", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
 
         object_fetch_files = Fetch_files()
         object_fetch_files.download_recent_file(path_destination_folder=path_destination_folder,address_ftp_list=address_ftp_list,access_date=access_date)
@@ -252,7 +272,7 @@ class Controller(QMainWindow, form_class):
         root_for_inspect = 'data/31. data_inspect/'
         path_statu_player= 'data/40. data_statu_player/'
         root_for_result_och = 'data/100. data_result'
-        path_player_num_info = 'helper/1. number_info/'
+        path_player_num_info = 'data/7. data_log_excel/' #'helper/1. number_info/'
         path_all_field_info = 'helper/output.csv'
 
         self.convert_process(root_gp, root_och, root_csv,
