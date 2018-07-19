@@ -1,3 +1,4 @@
+from model.fetch_files.ftp_model import Ftp_model
 
 class Fetch_files:
 
@@ -14,3 +15,6 @@ class Fetch_files:
                                                 path_destination_folder=path_destination_folder)
 
         object_ftp_model.remove_ftp_list()
+
+
+

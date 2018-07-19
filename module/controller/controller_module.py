@@ -7,6 +7,7 @@ from helper.find_field_csv import Find_field_csv
 from module.write_log.write_log_module import Write_log
 from module.fetch_files.fetch_files_module import Fetch_files
 from module.inspectdata.inspect_data_module import Inspect_data
+from module.rename_file.rename_file_module import Rename_file
 
 import os
 import sys
@@ -53,7 +54,6 @@ class Controller(QMainWindow, form_class):
         self.connect_function_and_widget() #버튼 담당
         self.set_listview("data/0. data_gp_format")  # 리스트 뷰 담당
 
-
     #멤버 변수 리스트에 정리해두기
     def get_ui(self):
         self.activity_widget = [self.activity_listview]
@@ -96,19 +96,21 @@ class Controller(QMainWindow, form_class):
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
         root_for_editted_file = 'data/5. data_csv_cut_error/'
-        root_for_excel = 'data/7. data_log_excel/'
+        root_for_log_excel = 'data/7. data_log_excel/'
         root_for_field = 'data/8. data_field_find/'
         root_for_log = 'data/9. data_log_csv/'
         root_for_noise = 'data/30. data_noise/'
         root_for_inspect = 'data/31. data_inspect/'
+        path_statu_player= 'data/40. data_statu_player/'
         root_for_result_och = 'data/100. data_result'
+        path_player_num_info = 'helper/1. number_info/'
         path_all_field_info = 'helper/output.csv'
 
         address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")]
         access_date = 0
 
-        self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och,
-                                                                                 root_csv,
+        self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och, root_csv,
+                                                                                 path_player_num_info, root_for_log_excel,
                                                                                  self.process_clicked_list,
                                                                                  self.checkbox_list[0][0].isChecked(),self.checkbox_list[0][1].isChecked()
                                                                                  ))
@@ -123,31 +125,38 @@ class Controller(QMainWindow, form_class):
                                                                                 ))
         self.button_widget_list[3].clicked.connect(lambda: self.output_process(root_for_result_och, root_for_editted_file,     #och 만드는데 필요한 변수
                                                                                root_summarized, root_for_field, root_for_log,   #로그 만드는데 필요한 변수
-                                                                                self.process_clicked_list,
+                                                                               path_statu_player,
+                                                                               self.process_clicked_list,
                                                                                self.checkbox_list[3][0].isChecked(), self.checkbox_list[3][1].isChecked()
                                                                                 ))
-        self.button_widget_list[4].clicked.connect(lambda: self.inspect_process(root_csv, root_for_excel, root_for_log, root_for_inspect,
+        self.button_widget_list[4].clicked.connect(lambda: self.inspect_process(root_csv, root_for_log_excel, root_for_log, root_for_inspect,
                                                                                 self.process_clicked_list
                                                                                 ))
         self.button_widget_list[5].clicked.connect(lambda: self.all_process())
 
         self.button_widget_list[6].clicked.connect(lambda: self.fetch_process(root_gp, address_ftp_list, access_date))
 
-    def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, name_folder_list,
-                        is_gp_to_och=True, is_och_to_csv=True):
+    def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, path_root_num_info,
+                        root_for_log, name_folder_list, is_gp_to_och=True, is_och_to_csv=True):
 
         for name_folder in name_folder_list:
 
             if is_gp_to_och:
-                print("Gp_to_och")
+                print("Gp_to_och_START")
+
                 object_converter = Converter()
                 object_converter.convert_gp_to_och(path_root_folder_gp, path_root_folder_och,
                                                    name_of_dir=name_folder)
+                print("Gp_to_och_END")
             if is_och_to_csv:
-                print("Och_to_csv")
+                print("Och_to_csv_START")
                 object_converter = Converter()
                 object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
                                                     name_of_dir=name_folder)
+                # is u18
+                object_rename = Rename_file()
+                object_rename.rename_csv_file(path_root_folder_csv, path_root_num_info, root_for_log, name_of_dir=name_folder)
+                print("Och_to_csv_END")
 
     def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field,
                         name_folder_list,
@@ -159,16 +168,16 @@ class Controller(QMainWindow, form_class):
             path_output_folder_for_field = os.path.join(path_root_folder_for_field, name_folder).replace("\\", "/")
 
             if is_min_average:
-                print("Min_average")
-                print(path_csv_folder+"/", path_output_folder_for_second_average+"/")
+                print("Min_average_START")
                 object_extract = Extract_data()
-
                 object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
+                print("Min_average_END")
 
             if is_field:
-                print("Field")
+                print("Field_find_START")
                 object_find_field = Find_field_csv()
-                object_find_field.find_field_csv_folder(path_csv_folder+"/", path_field_info, path_output_folder_for_field+"/")
+                object_find_field.find_field_csv_folder(path_csv_folder, path_field_info, path_output_folder_for_field)
+                print("Field_find_END")
 
     def filter_process(self, path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise,
                        path_root_folder_to_cut, path_root_folder_for_eddited_files,
@@ -177,43 +186,49 @@ class Controller(QMainWindow, form_class):
 
 
         for name_folder in name_folder_list:
-
             if is_find_noise:
-                print("FIND NOISE")
+                print("FIND_NOISE_START")
                 object_noise = NoiseFinder()
                 object_noise.find_noise_in_data(path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise, name_folder)
+                print("FIND_NOISE_END")
 
             if is_edit_data:
-                print("Edit Data")
+                print("Edit_Data_START")
                 object_edit = EditData()
                 object_edit.cut_error(path_root_folder_to_cut, path_root_folder_noise, path_root_folder_for_eddited_files, name_folder)
+                print("Edit_Data_END")
 
     def output_process(self, path_root_folder_processed_och, path_root_folder_processed_csv,                    #och 만드는데 필요한 변수
                        path_root_folder_for_min_average, path_root_folder_for_field, path_root_folder_for_log,       #로그 만드는데 필요한 변수
+                       path_write_statu_player,
                        name_folder_list,
                        is_och =True, is_log = True
                        ):
 
         for name_folder in name_folder_list:
             if is_och:
-                print("OUTPUT_OCH")
+                print("OUTPUT_OCH_START")
                 object_converter = Converter()
                 object_converter.convert_csv_to_och(path_root_folder_processed_csv,path_root_folder_processed_och,name_folder)
+                print("OUTPUT_OCH_END")
 
             if is_log:
-                print("OUTPUT_LOG")
+                print("OUTPUT_LOG_START")
                 Write_log()
-                writeObject = Write_log()
-                writeObject.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field, name_folder, path_root_folder_for_log) #출력하는 부분 업데이트 할 예정
+                Object_write_log = Write_log()
+                Object_write_log.detect_playing(path_root_folder_for_min_average, path_root_folder_for_field,
+                                                path_root_folder_for_log, path_write_statu_player, name_folder)
+                print("OUTPUT_LOG_END")
 
-    def inspect_process(self, root_csv, root_for_excel, root_for_log, root_for_inspect,
+    def inspect_process(self, root_csv, root_for_log_excel, root_for_log, root_for_inspect,
                        name_folder_list
                        ):
 
         for name_folder in name_folder_list:
-            print("INSPECT_DATA")
+            print("Inspect_data_START")
             object_inspect = Inspect_data()
-            object_inspect.do_inspection(root_for_excel, root_for_log, root_csv, root_for_inspect, name_folder)
+            object_inspect.do_inspection(root_for_log_excel, root_for_log, root_csv, root_for_inspect, name_folder)
+            print("Inspect_data_END")
 
     def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
 
@@ -224,8 +239,6 @@ class Controller(QMainWindow, form_class):
   
         Mbox("fetch", "다운로드 완료", 0)
 
-
-
     def all_process(self):
         print("all process start")
 
@@ -234,14 +247,18 @@ class Controller(QMainWindow, form_class):
         root_csv = 'data/2. data_csv_format/'
         root_summarized = 'data/3. data_csv_second_average/'
         root_for_editted_file = 'data/5. data_csv_cut_error/'
+        root_for_log_excel = 'data/7. data_log_excel/'
         root_for_field = 'data/8. data_field_find/'
         root_for_log = 'data/9. data_log_csv/'
         root_for_noise = 'data/30. data_noise/'
+        root_for_inspect = 'data/31. data_inspect/'
+        path_statu_player= 'data/40. data_statu_player/'
         root_for_result_och = 'data/100. data_result'
+        path_player_num_info = 'helper/1. number_info/'
         path_all_field_info = 'helper/output.csv'
 
-        self.convert_process(root_gp, root_och,
-                             root_csv,
+        self.convert_process(root_gp, root_och, root_csv,
+                             path_player_num_info, root_for_log_excel,
                              self.process_clicked_list,
                              self.checkbox_list[0][0].isChecked(),
                              self.checkbox_list[0][1].isChecked()
@@ -257,11 +274,15 @@ class Controller(QMainWindow, form_class):
                                         )
         self.output_process(root_for_result_och, root_for_editted_file,  # och 만드는데 필요한 변수
                             root_summarized, root_for_field, root_for_log,  # 로그 만드는데 필요한 변수
+                            path_statu_player,
                             self.process_clicked_list,
-                            is_och=True, is_log=True
+                            self.checkbox_list[3][0].isChecked(), self.checkbox_list[3][1].isChecked()
                             )
+        self. inspect_process(root_csv, root_for_log_excel, root_for_log, root_for_inspect,
+                              self.process_clicked_list
+                              )
 
-        print("all process end")
+        print("all process end\n")
 
         Mbox("All Process", "처리 완료", 0)
 

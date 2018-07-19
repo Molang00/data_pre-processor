@@ -2,26 +2,10 @@ import glob
 import os
 import time
 import openpyxl
-
+from helper import common_os_helper
 
 class Inspect_data:
     Players = []
-
-    def creat_dir(self, directory):
-        # directory dir명이 포함도니 path가 string으로 저장
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except:
-            print('Error: Creating directory. '+directory)
-
-    def check_slash(self, path_string):
-        # path_string 원하는 경로를 string으로 저장
-
-        # path의 마지막 경로에 /혹은 \가 없다면 /를 추가하여 return
-        if path_string[len(path_string)-1] != '/' and path_string[len(path_string)-1] != '\\':
-            path_string = path_string+'/'
-        return path_string
 
     def find_file_name(self, name_string, place):
         # name_string 폴더의 이름을 string형태로 저장
@@ -31,7 +15,7 @@ class Inspect_data:
         name_list = name_string.split('-')
         value_list = name_list[1].split('_')
 
-        new_name = name_list[0] + '-' + str(value_list[0])
+        new_name = name_list[0] + '-' + str(int(value_list[0]))
         if value_list[1] == 'U17':
             new_name = new_name + '_U17'
         new_name = new_name+'_'+place+'_'+value_list[2]
@@ -78,9 +62,9 @@ class Inspect_data:
             return -1
         if comparision_value_larger[0]<list_value[0]:
             return 1
-        if comparision_value_smaller[1]>list_value[1]:
+        if comparision_value_smaller[0]==list_value[0] and comparision_value_smaller[1]>list_value[1]:
             return -1
-        if comparision_value_larger[1]<list_value[1]:
+        if comparision_value_larger[0]==list_value[0] and comparision_value_larger[1]<list_value[1]:
             return 1
         return 0
 
@@ -165,10 +149,10 @@ class Inspect_data:
     def find_diff_log(self, path_read_xl_folder, path_read_log_folder, path_write_folder, name_of_dir):
         # excel file과 log.csv의 다른 부분을 error로 판단하여 file에 기록
 
-        path_read_xl_folder = self.check_slash(path_read_xl_folder)
-        path_read_log_folder = self.check_slash(path_read_log_folder)
-        path_write_folder = self.check_slash(path_write_folder)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_xl_folder = common_os_helper.check_slash(path_read_xl_folder)
+        path_read_log_folder = common_os_helper.check_slash(path_read_log_folder)
+        path_write_folder = common_os_helper.check_slash(path_write_folder)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_write_folder = path_write_folder+name_of_dir
 
         file_to_read_log = open(path_read_log_folder+name_of_dir+'log.csv')
@@ -193,7 +177,7 @@ class Inspect_data:
 
         error_list = []
         if error != 0:
-            error_list.append('TimeDiff,START1')
+            error_list.append('TimeDiff,START1,incorrect')
 
         sub_in_list = []
         sub_out_list = []
@@ -208,7 +192,7 @@ class Inspect_data:
                 if int(time_list[0]) <= 45:
                     time_str = self.time_calculate(start_time1, time_int, False)
                 else:
-                    time_str = self.time_calculate(start_time2, time_int, False)
+                    time_str = self.time_calculate(start_time2, time_int-45, False)
                 sub_in_list.append([int(row[1].value), time_str])
                 sub_out_list.append([int(row[2].value), time_str])
 
@@ -230,15 +214,23 @@ class Inspect_data:
                 if self.time_comparision(log_list[1], end_time2, 3) != 0:
                     error_list.append('TimeDiff,END2,incorrect')
             if log_list[0] == 'SUB':
-                sub_log_in_list.append([int(log_list[3]), log_list[1]])
-                sub_log_out_list.append([int(log_list[2]), log_list[1]])
+                try:
+                    sub_log_in_list.append([int(log_list[3]), log_list[1]])
+                    sub_log_out_list.append([int(log_list[2]), log_list[1]])
+                except:
+                    try:
+                        sub_log_out_list.append([int(log_list[2]), log_list[1]])
+                    except:
+                        continue
 
         self.set_players_runtime(sub_log_in_list, sub_log_out_list)
 
         # sub된 선수들에 대해 log.csv와 excel file이 다른 부분이 있는지 확인, 기록
-        error_code = [["SubPlayerDiff,", ",Can't find at log"], ["SubPlayerDiff,", "Can't find at info"],
-                      ["TimeDiff,", ",incorrect"]]
+        error_code = [["Sub_InPlayerDiff,", ",Can't find at log"], ["Sub_InPlayerDiff,", "Can't find at info"],
+                      ["Sub_InTimeDiff,", ",incorrect"]]
         error_list = self.list_compare(sub_in_list, sub_log_in_list, error_list, error_code)
+        error_code = [["Sub_OutPlayerDiff,", ",Can't find at log"], ["Sub_OutPlayerDiff,", "Can't find at info"],
+                      ["Sub_OutTimeDiff,", ",incorrect"]]
         error_list = self.list_compare(sub_out_list, sub_log_out_list, error_list, error_code)
 
         # error file에 기록
@@ -248,9 +240,9 @@ class Inspect_data:
     def look_up_files_stable(self, path_raw_data, path_write, name_of_dir):
         # 기기로부터 안정적으로 정보를 받아오지 않았다면 error로 판단, 기록
 
-        path_raw_data = self.check_slash(path_raw_data)
-        path_write = self.check_slash(path_write)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_raw_data = common_os_helper.check_slash(path_raw_data)
+        path_write = common_os_helper.check_slash(path_write)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_raw_data = path_raw_data + name_of_dir
         path_write = path_write + name_of_dir
 
@@ -260,20 +252,23 @@ class Inspect_data:
             read_values = file.readlines()
 
             valid_count = 0.0
-            total_count = 0.0
-            for i in range(1, len(read_values), 300):
+            in_time = player[1].split(':')
+            out_time = player[2].split(':')
+            total_count = float(out_time[0])*60+float(out_time[1])-float(in_time[0])*60-float(in_time[1])
+            for i in range(1, len(read_values), 600):
                 time_str = read_values[i].split(',')[3:5]
                 time_str = time_str[0]+':'+time_str[1]
-                if (self.time_comparision(time_str, player[1], 3) >= 0) and (
-                        self.time_comparision(time_str, player[2], 3) <= 0):
+                if (self.time_comparision(time_str, player[1], 1) >= 0) and (
+                        self.time_comparision(time_str, player[2], 1) <= 0):
                     valid_count += 1.0
-                total_count += 1.0
 
             # player가 뛴 시간의 90% 이하로 정보가 있다면 불안정하다고 판단
-            if valid_count/total_count <= 0.6:
+            if valid_count/total_count <= 0.8:
                 error_list.append("Unstable,"+str(player[0])+",Input value lost")
-            elif valid_count/total_count <= 0.9:
+            elif valid_count/total_count <= 0.95:
                 error_list.append("Unstable,"+str(player[0])+",Some input value lost")
+            else:
+                error_list.append("Stable,"+str(player[0]))
 
         # error file에 기록
         write_order = "ErrorCode,ErrorValue,Detail\n"
@@ -281,10 +276,10 @@ class Inspect_data:
 
     def look_up_player(self, path_read_xl, path_raw_data, path_write, name_of_dir):
         # excel file에 뛰었다고 기록된 선수가 log.csv에 뛰었다고 기록되어 있고, 데이터도 있는지 확인, 기록
-        path_read_xl = self.check_slash(path_read_xl)
-        path_raw_data = self.check_slash(path_raw_data)
-        path_write = self.check_slash(path_write)
-        name_of_dir = self.check_slash(name_of_dir)
+        path_read_xl = common_os_helper.check_slash(path_read_xl)
+        path_raw_data = common_os_helper.check_slash(path_raw_data)
+        path_write = common_os_helper.check_slash(path_write)
+        name_of_dir = common_os_helper.check_slash(name_of_dir)
         path_raw_data = path_raw_data+name_of_dir
         path_write = path_write+name_of_dir
 
@@ -292,12 +287,14 @@ class Inspect_data:
         player_raw = []
         error_list = []
         for player in files_raw:
-            player_num = player[len(path_raw_data):len(player)-4]
+            player = player.replace('\\', '/')
+            player = player.replace(path_raw_data, '')
+            player = player.replace('.csv', '')
             # player의 등번호가 시리얼 번호와 맞지않아 번환되지 않았다면 NoMatch error
-            if len(player_num.split('_')) > 1:
-                error_list.append("NoMatch,"+str(player_num)+",There is no player_num")
+            if '_' in player or '(' in player:
+                error_list.append("NoMatch,"+str(player)+",There is no player_num")
             else:
-                player_raw.append([int(player_num),0])
+                player_raw.append([int(player), 0])
 
         # 경기가 home인지 away인지 모르기 때문에 둘 다 시도
         try:
@@ -321,24 +318,7 @@ class Inspect_data:
 
     def do_inspection(self, path_read_xl, path_read_log, path_raw_data, path_write, name_of_dir):
         # 3가지 주된 method를 실행하여 전체적인 inspection을 진행
+        self.Players.clear()
         self.look_up_player(path_read_xl, path_raw_data, path_write, name_of_dir)
         self.find_diff_log(path_read_xl, path_read_log, path_write, name_of_dir)
         self.look_up_files_stable(path_raw_data, path_write, name_of_dir)
-
-
-if __name__ == "__main__":
-
-    start_time = time.time()
-
-    root_read_xl = 'data/9. data_log_xl/'
-    root_read_log = 'data/0. data_gp_format/'
-    root_raw_data = 'data/2. data_csv_format/'
-    root_write = 'data/31. data_inspection/'
-    name_of_dir = 'A-04_U18_수원F/'
-
-    InspectDataObject = Inspect_data()
-    InspectDataObject.do_inspection(root_read_xl, root_read_log, root_raw_data, root_write, name_of_dir)
-
-    end_time = time.time()-start_time
-    print('noise_finder : '+str(format(end_time, '.6f'))+'sec\n')
-

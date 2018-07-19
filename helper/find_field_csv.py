@@ -95,6 +95,7 @@ class Find_field_csv:
         return output
 
     def find_field_csv_file(self, csv_file_path, field_info_path):
+        tmp_field_data = []
         output = []
         with open(csv_file_path, 'r') as f:
             lines = f.readlines()
@@ -107,8 +108,10 @@ class Find_field_csv:
                     print(e)
                 field_data = self.findField(float(lon), float(lat), field_info_path)
                 if field_data != []:
-                    output = field_data
-                    break
+                    if output == field_data: #단위 시간 이후 같은 경기장에 있을 경우에 break and return 하도록 한다
+                        break
+                    else:
+                        output = field_data
                 i += 3000  # 5분단위
         return output
 
