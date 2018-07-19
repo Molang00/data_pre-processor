@@ -121,20 +121,24 @@ class Find_field_csv:
     def find_field_csv_folder(self, csv_folder_path, field_info_path, path_to_save):
         outputList = []
         csv_folder_path=self.check_slash(csv_folder_path)
-        path_to_save=self.check_slash(path_to_save)
+        path_to_save = self.check_slash(path_to_save)
         files_csv = glob.glob(csv_folder_path + '*.csv')
+
+        # 디렉토리가 없으면은 생성해준다.
+        try:
+            if not os.path.exists(path_to_save):
+                os.makedirs(path_to_save)
+            else:
+                print("path_to_save", path_to_save)
+        except OSError:
+            print('Error: Creating directory.' + path_to_save)
+
         # int로 바꿔서 sorting해주는 알고리즘도 해주면 좋을듯
         for file_csv in files_csv:
             csv_file_path = os.path.join(str(file_csv)).replace("\\", "/")
             field_data = self.find_field_csv_file(csv_file_path, field_info_path)
             name_file_csv = file_csv.replace('\\', '/,')
             outputList.append([name_file_csv, field_data])
-            # 디렉토리가 없으면은 생성해준다.
-            try:
-                if not os.path.exists(path_to_save):
-                    os.makedirs(path_to_save)
-            except OSError:
-                print('Error: Creating directory.' + path_to_save)
 
         with open(path_to_save + "fieldmatch.txt", "w+", encoding="utf-8") as f:
             f.write(

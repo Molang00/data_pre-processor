@@ -156,7 +156,7 @@ class Controller(QMainWindow, form_class):
 
         try:
             for name_folder in name_folder_list:
-
+                print(name_folder)
                 if is_gp_to_och:
                     print("Gp_to_och_START")
                     object_converter = Converter()
@@ -178,22 +178,26 @@ class Controller(QMainWindow, form_class):
                         name_folder_list,
                         is_min_average=True, is_field=True):
 
-        for name_folder in name_folder_list:
-            path_csv_folder = os.path.join(path_root_folder_input,name_folder).replace("\\", "/")
-            path_output_folder_for_second_average = os.path.join(path_root_folder_for_min_average, name_folder).replace("\\", "/")
-            path_output_folder_for_field = os.path.join(path_root_folder_for_field, name_folder).replace("\\", "/")
+        try:
+            for name_folder in name_folder_list:
+                print(name_folder)
+                path_csv_folder = os.path.join(path_root_folder_input,name_folder).replace("\\", "/")
+                path_output_folder_for_second_average = os.path.join(path_root_folder_for_min_average, name_folder).replace("\\", "/")
+                path_output_folder_for_field = os.path.join(path_root_folder_for_field, name_folder).replace("\\", "/")
 
-            if is_min_average:
-                print("Min_average_START")
-                object_extract = Extract_data()
-                object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
-                print("Min_average_END")
+                if is_min_average:
+                    print("Min_average_START")
+                    object_extract = Extract_data()
+                    object_extract.summarize_csv(path_csv_folder+"/", path_output_folder_for_second_average+"/")
+                    print("Min_average_END")
 
-            if is_field:
-                print("Field_find_START")
-                object_find_field = Find_field_csv()
-                object_find_field.find_field_csv_folder(path_csv_folder, path_field_info, path_output_folder_for_field)
-                print("Field_find_END")
+                if is_field:
+                    print("Field_find_START")
+                    object_find_field = Find_field_csv()
+                    object_find_field.find_field_csv_folder(path_csv_folder, path_field_info, path_output_folder_for_field)
+                    print("Field_find_END")
+        except Exception as e:
+            print(e)
 
     def filter_process(self, path_root_folder_summarized_data, path_read_field_folder, path_root_folder_noise,
                        path_root_folder_to_cut, path_root_folder_for_eddited_files,
@@ -241,12 +245,14 @@ class Controller(QMainWindow, form_class):
     def inspect_process(self, root_csv, root_for_log_excel, root_for_log, root_for_inspect,
                        name_folder_list
                        ):
-
-        for name_folder in name_folder_list:
-            print("Inspect_data_START")
-            object_inspect = Inspect_data()
-            object_inspect.do_inspection(root_for_log_excel, root_for_log, root_csv, root_for_inspect, name_folder)
-            print("Inspect_data_END")
+        try:
+            for name_folder in name_folder_list:
+                print("Inspect_data_START")
+                object_inspect = Inspect_data()
+                object_inspect.do_inspection(root_for_log_excel, root_for_log, root_csv, root_for_inspect, name_folder)
+                print("Inspect_data_END")
+        except Exception as e:
+            print(e)
 
     def fetch_process(self, path_destination_folder = "data/0. data_gp_format", address_ftp_list = [("175.207.29.99", 50021, "kleaguejunior2018", "junior2018")], access_date=0):
 

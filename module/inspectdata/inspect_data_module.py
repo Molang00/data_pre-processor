@@ -4,6 +4,8 @@ import time
 import openpyxl
 from helper import common_os_helper
 
+
+
 class Inspect_data:
     Players = []
 
@@ -139,7 +141,7 @@ class Inspect_data:
 
     def write_error(self, path_write_folder, file_name, write_order, error_list):
         # error를 file에 기록
-        self.creat_dir(path_write_folder)
+        common_os_helper.create_dir(path_write_folder)
         file_to_write = open(path_write_folder + file_name, 'w', encoding="utf-8")
         file_to_write.write(write_order)
         for error_str in error_list:
