@@ -1,6 +1,5 @@
 import math
 import glob
-import os
 import numpy
 from helper import common_os_helper
 from helper.find_field_csv import Find_field_csv
@@ -98,7 +97,8 @@ class NoiseFinder:
                 pointB = (float(lonB[1:]), float(latB[1:]))
                 pointC = (float(lonC[1:]), float(latC[1:]))
                 pointD = (float(lonD[1:]), float(latD[1:len(latD)-2]))
-                pointA, pointB, pointC, pointD = Find_field_csv.expand_field(pointA, pointB, pointC, pointD, 1.2)
+                find_object = Find_field_csv()
+                pointA, pointB, pointC, pointD = find_object.expand_field(pointA, pointB, pointC, pointD, 1.2)
             except:
                 ck_field = 0
 
@@ -147,7 +147,7 @@ class NoiseFinder:
                 latitude_float = float(value_csv_list[7])
                 pointP = (longitude_float, latitude_float)
 
-                if (ck_field and Find_field_csv.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
+                if (ck_field and find_object.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD)) \
                         and value_list != read_values[len(read_values) - 1]:
                     if last_field == 0:
                         last_field = 1
