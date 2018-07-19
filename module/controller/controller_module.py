@@ -11,6 +11,7 @@ from module.rename_file.rename_file_module import Rename_file
 
 import os
 import sys
+import time
 
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
@@ -265,6 +266,8 @@ class Controller(QMainWindow, form_class):
 
     def all_process(self):
         print("all process start")
+        # 시작시간 (프로세스 시간 측정용)
+        start_time = time.time()
 
         root_gp = "data/0. data_gp_format"
         root_och = 'data/1. data_och_format/'
@@ -307,7 +310,7 @@ class Controller(QMainWindow, form_class):
                               )
 
         print("all process end\n")
-
+        print("--- %s seconds ---" % (time.time() - start_time))
         Mbox("All Process", "처리 완료", 0)
 
     def manage_token(self, path_root_folder_output, name_folder, process_handled, process_type):
