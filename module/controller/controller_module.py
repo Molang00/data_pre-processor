@@ -108,7 +108,6 @@ class Controller(QMainWindow, form_class):
 
         address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")]
         access_date = 0
-
         self.button_widget_list[0].clicked.connect(lambda : self.convert_process(root_gp, root_och, root_csv,
                                                                                  path_player_num_info, root_for_log_excel,
                                                                                  self.process_clicked_list,

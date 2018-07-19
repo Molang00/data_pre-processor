@@ -1,6 +1,7 @@
 import glob
 import os
 import time
+import shutil
 
 
 class EditData:
@@ -144,35 +145,36 @@ class EditData:
             file_to_write.close()
         file_to_error_read.close()
 
-    def split_file(Start1_18 ,End2_18, Start1_17, End2_17,path_read_csv, name_of_dir):
+    def split_file(self, Start1_18 ,End2_18, Start1_17, End2_17,path_read_csv, name_of_dir):
         name_of_dir17 = name_of_dir.replace('18', '17')
-        name_of_dir18 = 'temp'
+        name_of_dir_tmp = 'temp/'
         self.create_dir(path_read_csv+name_of_dir17)
-        self.create_dir(path_read_csv+name_of_dir18)
+        self.create_dir(path_read_csv+name_of_dir_tmp)
 
-        Start1_18.replace(':', '.')
-        Start1_18 = Start1_18+'.0'
-        End2_18.replace(':', '.')
-        End2_18 = End2_18+'.0'
-        Start1_17.replace(':', '.')
-        Start1_17 = Start1_17+'.0'
-        End2_17.replace(':', '.')
-        End2_17 = End2_17+'.0'
+        Start1_18 = Start1_18.replace(':', '.')+'.0'
+        End2_18 = End2_18.replace(':', '.')+'.0'
+        Start1_17 = Start1_17.replace(':', '.')+'.0'
+        End2_17 = End2_17.replace(':', '.')+'.0'
 
         files_read_csv = glob.glob(path_read_csv+name_of_dir+'*.csv')
         for file_read_csv in files_read_csv:
-            file_to_read = open(file_read_csv, 'r')
+            file_read_csv = file_read_csv.replace('\\', '/')
+            shutil.move(file_read_csv, file_read_csv.replace(name_of_dir, name_of_dir_tmp))
+            file_to_read = open(file_read_csv.replace(name_of_dir, name_of_dir_tmp), 'r')
             read_values = file_to_read.readlines()
-            file_to_read.close()
             file_to_write17 = open(file_read_csv.replace(name_of_dir, name_of_dir17), 'w')
             file_to_write18 = open(file_read_csv, 'w')
 
-            for read_value in read_values:
-                time_str = read_value[3]+'.'+read_value[4]+'.'+read_value[5]
+            for read_value in read_values[1:]:
+                read_list = read_value.split(',')
+                time_str = read_list[3]+'.'+read_list[4]+'.'+read_list[5]
                 if self.time_comparision(time_str, Start1_18, End2_18, 300) == 0:
                     file_to_write18.write(read_value)
                 if self.time_comparision(time_str, Start1_17, End2_17, 300) == 0:
                     file_to_write17.write(read_value)
 
+            file_to_read.close()
+            os.remove(file_read_csv.replace(name_of_dir, name_of_dir_tmp))
             file_to_write17.close()
             file_to_write18.close()
+        os.rmdir(path_read_csv+name_of_dir_tmp)

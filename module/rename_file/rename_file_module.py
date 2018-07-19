@@ -71,7 +71,11 @@ class Rename_file:
 
         path_target_folder = self.check_slash(path_target_folder)
         path_read_info_folder = self.check_slash(path_read_info_folder)
+        path_read_xl = self.check_slash(path_read_xl)
         name_of_dir = self.check_slash(name_of_dir)
+
+        self.detect_games(path_target_folder, path_read_xl, name_of_dir)
+
         path_target_folder = path_target_folder+name_of_dir
 
         self.create_dir(path_target_folder+'noneed/')
@@ -107,7 +111,7 @@ class Rename_file:
                     back_num = info_values[index].split(',')[1]
                     back_num = back_num[:len(back_num)-1]
                 # 정렬된 상황에서 target_num < serial_num은 같은 번호를 가진 serial_num이 없다는 뜻이므로 noneed로 이동
-                if target_num < serial_num:
+                if target_num < serial_num or back_num == '':
                     shutil.move(file_target, path_target_folder+'noneed/'+name_list[len(name_list)-1])
                     continue
             except IndexError:
@@ -117,14 +121,12 @@ class Rename_file:
             # 같은 serial number를 가진 파일이 여러개일 경우 (count)의 형식으로 이름에 추가
             if last == target_num:
                 count = count+1
-                re_num = back_num+'('+str(count)+')'
+                re_num = str(back_num)+'('+str(count)+')'
             else:
                 count = 0
-                re_num = back_num
+                re_num = str(back_num)
                 last = target_num
 
             name_list[len(name_list)-1] = re_num+'.csv'
             new_name = path_target_folder+name_list[len(name_list)-1]
             os.rename(file_target, new_name)
-        
-        # self.detect_games(path_target_folder, path_read_xl, name_of_dir)

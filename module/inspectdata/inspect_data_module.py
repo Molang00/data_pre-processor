@@ -255,7 +255,6 @@ class Inspect_data:
 
     def look_up_files_stable(self, path_raw_data, path_write, name_of_dir):
         # 기기로부터 안정적으로 정보를 받아오지 않았다면 error로 판단, 기록
-
         path_raw_data = self.check_slash(path_raw_data)
         path_write = self.check_slash(path_write)
         name_of_dir = self.check_slash(name_of_dir)
@@ -318,7 +317,7 @@ class Inspect_data:
         except:
             file_to_read_xl = openpyxl.load_workbook(path_read_xl+self.find_file_name(name_of_dir, 'A'))
         active_sheet = file_to_read_xl.active
-        player_info = active_sheet['F11':'F28']
+        player_info = active_sheet['F12':'F28']
         player_num = []
         for player in player_info:
             if player[0].value:
