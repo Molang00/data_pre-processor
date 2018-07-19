@@ -1,6 +1,5 @@
 import glob
 import math
-import os
 from helper.find_field_csv import Find_field_csv
 from helper import common_os_helper
 
@@ -8,6 +7,35 @@ from helper import common_os_helper
 
 class Write_log:
 
+    # 필드 정보를 읽어들여서 선수가 필드 안에있는지 바깥에 있는지 check해서 안에있으면 true, 바깥에 있으면 False
+    def check_in_field(self, longitude, latitude, data):
+
+        try:
+            data[11] = data[11].replace("]", '0')
+            # 경로,파일명,번호,구장이름,위도,경도
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = data[4:]
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = float(lonA), float(latA), float(lonB), float(latB), float(
+                lonC), float(latC), float(lonD), float(latD)
+        except:
+            return False
+
+        pointP = (longitude, latitude)
+        pointA = (lonA, latA)
+        pointB = (lonB, latB)
+        pointC = (lonC, latC)
+        pointD = (lonD, latD)
+
+        # expandfield로 필드를 찾을 때 보정값을 넣은 후에
+        try:
+            find_object= Find_field_csv()
+            pointA, pointB, pointC, pointD = find_object.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        except Exception as e:
+            print(e)
+        # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
+        if find_object.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
+            return True
+        else:
+            return False
 
     # 선수의 속도값을 읽어들여서 3~40사이의 속도를 가지면 활동중이라고 판단함
     def check_activation(self, speed):
@@ -83,10 +111,12 @@ class Write_log:
                     lati = float(value_temp[1]) / count
                     speed = float(value_temp[2]) / count
                     playing = self.check_activation(speed)
+
                     print("Process A")
                     find_field_object = Find_field_csv()
                     infield = find_field_object.find_in_field(longi, lati, field_info_list)
                     print("Process B")
+
 
                     # 만약 속도와 위치 모두가 활동성이 있다고 확인되면 True고 아니면 False이다.
                     if playing and infield:
@@ -430,7 +460,6 @@ class Write_log:
         path_statu_player=common_os_helper.check_slash(path_statu_player)
         for f in files_csv:
             f = f.replace('\\', '/')
-
         players = self.read_csv_files(players, files_csv, path_csv_folder, path_field_info)
         time_table = self.find_time_table(time_table, players)
         time_table = self.check_number_playing_in_time_table(time_table, players)

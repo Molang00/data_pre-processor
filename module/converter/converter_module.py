@@ -21,7 +21,6 @@ class Converter:
 
         files_gp = glob.glob(path_gp)
 
-
         for file_gp in files_gp:
             file_och = path_och+file_gp[len(path_gp)-4:]
             file_och = file_och[:len(file_och)-2]+'och'

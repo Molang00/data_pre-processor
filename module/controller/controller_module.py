@@ -153,6 +153,7 @@ class Controller(QMainWindow, form_class):
 
     def convert_process(self, path_root_folder_gp, path_root_folder_och, path_root_folder_csv, path_root_num_info,
                         root_for_log, name_folder_list, is_gp_to_och=True, is_och_to_csv=True):
+
         try:
             for name_folder in name_folder_list:
 
@@ -172,7 +173,6 @@ class Controller(QMainWindow, form_class):
                     print("Och_to_csv_END")
         except Exception as e:
             print(e)
-            exit()
 
     def extract_process(self, path_root_folder_input, path_root_folder_for_min_average, path_field_info, path_root_folder_for_field,
                         name_folder_list,
