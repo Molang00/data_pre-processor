@@ -110,10 +110,6 @@ class Controller(QMainWindow, form_class):
 
     def connect_function_and_widget(self):
 
-
-
-
-
         self.button_widget_list[0].clicked.connect(self.convert_process)
         self.button_widget_list[1].clicked.connect(self.extract_process)
         self.button_widget_list[2].clicked.connect(self.filter_process)
@@ -148,9 +144,13 @@ class Controller(QMainWindow, form_class):
                     object_converter = Converter()
                     object_converter.convert_och_to_csv(path_root_folder_och, path_root_folder_csv,
                                                         name_of_dir=name_folder)
+                    print("Och_to_csv_END")
+
+                    print("Csv_to_csv_rename_Start")
                     object_rename = Rename_file()
                     object_rename.rename_csv_file(path_root_folder_csv, path_root_num_info, root_for_log, name_of_dir=name_folder)
-                    print("Och_to_csv_END")
+                    print("Csv_to_csv_rename_End")
+
         except Exception as e:
             print(e)
 

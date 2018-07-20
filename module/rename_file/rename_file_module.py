@@ -67,6 +67,7 @@ class Rename_file:
             file_read_info = open(path_read_info_folder+self.find_file_name(name_of_dir, 'A'), 'r')
 
         info_values = file_read_info.readlines()
+        file_read_info.close()
         info_values.sort()
         index = -1
         serial_num = -1
@@ -109,6 +110,7 @@ class Rename_file:
 
             name_list[len(name_list)-1] = re_num+'.csv'
             new_name = path_target_folder+name_list[len(name_list)-1]
-            os.rename(file_target, new_name)
-        
+            #os.rename(file_target, new_name)
+            shutil.move(file_target, new_name)
+
         # self.detect_games(path_target_folder, path_read_xl, name_of_dir)
