@@ -111,7 +111,10 @@ class Write_log:
                     lati = float(value_temp[1]) / count
                     speed = float(value_temp[2]) / count
                     playing = self.check_activation(speed)
-                    infield = self.check_in_field(longi, lati, field_info_list)
+
+                    find_field_object = Find_field_csv()
+                    infield = find_field_object.check_in_field(longi, lati, field_info_list)
+
                     # 만약 속도와 위치 모두가 활동성이 있다고 확인되면 True고 아니면 False이다.
                     if playing and infield:
                         check = True
@@ -122,6 +125,7 @@ class Write_log:
                     check_time_temp = check_time
                     value_temp = value
                     count = 1
+
             players.append(player)  # 이렇게 읽어드린csv파일들을 player라는 형태의 list로 players에 저장
         return players
 

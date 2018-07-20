@@ -75,7 +75,7 @@ class Find_field_csv:
         return insideTriangle
 
     # parsedfieldpath는 output.csv를 읽히는 것이다.
-    def findField(self, longitude, latitude, parsedFieldFilePath):
+    def find_in_field(self, longitude, latitude, parsedFieldFilePath):
         df = pd.read_csv(parsedFieldFilePath)
         output = []
         for i in range(len(df)):
@@ -108,7 +108,8 @@ class Find_field_csv:
                     lon, lat = lines[i + 1].split(',')[7:9]  # 10hz기준
                 except Exception as e:
                     print(e)
-                field_data = self.findField(float(lon), float(lat), field_info_path)
+
+                field_data = self.find_in_field(float(lon), float(lat), field_info_path)
                 if field_data != []:
                     if output == field_data: #단위 시간 이후 같은 경기장에 있을 경우에 break and return 하도록 한다
                         break
@@ -120,26 +121,55 @@ class Find_field_csv:
     def find_field_csv_folder(self, csv_folder_path, field_info_path, path_to_save):
         outputList = []
         csv_folder_path=self.check_slash(csv_folder_path)
-        path_to_save=self.check_slash(path_to_save)
+        path_to_save = self.check_slash(path_to_save)
         files_csv = glob.glob(csv_folder_path + '*.csv')
+
+        # 디렉토리가 없으면은 생성해준다.
+        try:
+            if not os.path.exists(path_to_save):
+                os.makedirs(path_to_save)
+            else:
+                print("path_to_save", path_to_save)
+        except OSError:
+            print('Error: Creating directory.' + path_to_save)
+
         # int로 바꿔서 sorting해주는 알고리즘도 해주면 좋을듯
         for file_csv in files_csv:
             csv_file_path = os.path.join(str(file_csv)).replace("\\", "/")
             field_data = self.find_field_csv_file(csv_file_path, field_info_path)
             name_file_csv = file_csv.replace('\\', '/,')
             outputList.append([name_file_csv, field_data])
-            # 디렉토리가 없으면은 생성해준다.
-            try:
-                if not os.path.exists(path_to_save):
-                    os.makedirs(path_to_save)
-            except OSError:
-                print('Error: Creating directory.' + path_to_save)
 
         with open(path_to_save + "fieldmatch.txt", "w+", encoding="utf-8") as f:
             f.write(
                 'path of data file,file name,field number,field name,pointA(lon,lat),pointB(lon,lat),pointC(lon,lat),pointD(lon,lat)\n')
             lines = "\n".join(e[0] + ", " + str(e[1]) for e in outputList)
             f.writelines(lines)
+
+# 필드 정보를 읽어들여서 선수가 필드 안에있는지 바깥에 있는지 check해서 안에있으면 true, 바깥에 있으면 False
+    def check_in_field(self, longitude, latitude, data):
+        try:
+            data[11] = data[11].replace("]", '0')
+            # 경로,파일명,번호,구장이름,위도,경도
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = data[4:]
+            lonA, latA, lonB, latB, lonC, latC, lonD, latD = float(lonA), float(latA), float(lonB), float(latB), float(
+                lonC), float(latC), float(lonD), float(latD)
+        except:
+            return False
+
+        pointP = (longitude, latitude)
+        pointA = (lonA, latA)
+        pointB = (lonB, latB)
+        pointC = (lonC, latC)
+        pointD = (lonD, latD)
+
+        # expandfield로 필드를 찾을 때 보정값을 넣은 후에
+        pointA, pointB, pointC, pointD = self.expand_field(pointA, pointB, pointC, pointD, 1.0)
+        # 만약 직사각형 필드 안에 선수가 있으면 True를 반환
+        if self.checkPointInRectangle(pointP, pointA, pointB, pointC, pointD):
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":

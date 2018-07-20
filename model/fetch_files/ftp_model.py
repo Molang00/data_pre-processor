@@ -115,7 +115,7 @@ class Ftp_model:
 
 if __name__=="__main__":
     object_ftp = Ftp_model()
-    address_ftp_list = [("fitogether.co", 50021, "kleaguejunior2018", "junior2018")]
+    address_ftp_list = [("175.207.29.99", 50021, "kleaguejunior2018", "junior2018")]
     object_ftp = Ftp_model()
     object_ftp.make_ftp_list(address_ftp_list)
     object_ftp.download_new_Files(object_ftp.ftp_list[0], category="junior", path_destination_folder="C:/Users/fitogether/Documents/AuFe/8. temp")
